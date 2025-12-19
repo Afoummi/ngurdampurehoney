@@ -18,14 +18,14 @@ export function HeroSection() {
             </div>
             
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              Experience the{" "}
-              <span className="text-gradient">Golden Sweetness</span>{" "}
-              of Nature
+              Discover{" "}
+              <span className="text-gradient">Ngurdam Pure Honey</span>{" "}
+              – Nature's Finest
             </h1>
             
             <p className="text-lg text-muted-foreground max-w-lg">
-              AB Sardauna brings you premium, unprocessed honey sourced directly from 
-              Nigerian apiaries. Pure taste, natural goodness, delivered to your doorstep.
+              AB Sardauna brings you Ngurdam Pure Honey – premium, unprocessed honey 
+              sourced directly from Nigerian apiaries. Pure taste, natural goodness, delivered to your doorstep.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
