@@ -14,12 +14,12 @@ export default function About() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
                 <h1 className="font-display text-4xl md:text-5xl font-bold">
-                  Our Story of <span className="text-gradient">Pure Honey</span>
+                  The Story of <span className="text-gradient">Ngurdam Pure Honey</span>
                 </h1>
                 <p className="text-lg text-muted-foreground">
                   AB Sardauna was founded with a simple mission: to bring the purest, 
                   most authentic honey from Nigerian apiaries directly to your table. 
-                  We believe in preserving nature's goodness without any compromise.
+                  Our flagship product, Ngurdam Pure Honey, embodies our commitment to preserving nature's goodness.
                 </p>
                 <p className="text-muted-foreground">
                   Our journey began with a passion for natural, unprocessed foods and 

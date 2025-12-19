@@ -15,7 +15,7 @@ export function Footer() {
               <span className="font-display text-xl font-bold">AB Sardauna</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Pure, natural honey sourced directly from Nigerian apiaries. 
+              Makers of Ngurdam Pure Honey – sourced directly from Nigerian apiaries. 
               Experience the golden sweetness of nature.
             </p>
             <div className="flex gap-4">
