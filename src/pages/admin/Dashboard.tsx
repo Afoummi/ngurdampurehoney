@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { OrdersTab } from "@/components/admin/OrdersTab";
 import { CustomersTab } from "@/components/admin/CustomersTab";
 import { SettingsTab } from "@/components/admin/SettingsTab";
+import { ProductsTab } from "@/components/admin/ProductsTab";
 
 interface DashboardStats {
   totalOrders: number;
@@ -217,6 +218,10 @@ export default function AdminDashboard() {
               <ShoppingCart className="h-4 w-4" />
               Orders
             </TabsTrigger>
+            <TabsTrigger value="products" className="gap-2">
+              <Package className="h-4 w-4" />
+              Products
+            </TabsTrigger>
             <TabsTrigger value="customers" className="gap-2">
               <Users className="h-4 w-4" />
               Customers
@@ -229,6 +234,10 @@ export default function AdminDashboard() {
           
           <TabsContent value="orders">
             <OrdersTab onOrderUpdate={fetchStats} />
+          </TabsContent>
+          
+          <TabsContent value="products">
+            <ProductsTab />
           </TabsContent>
           
           <TabsContent value="customers">
