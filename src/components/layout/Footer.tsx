@@ -61,9 +61,9 @@ export function Footer() {
                 <Mail className="w-4 h-4" />
                 info@absardauna.com
               </li>
-              <li className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="w-4 h-4" />
-                +234 800 000 0000
+              <li className="flex items-start gap-2 text-muted-foreground">
+                <Phone className="w-4 h-4 mt-0.5" />
+                <span>08027798163<br />08035890705</span>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4 mt-0.5" />

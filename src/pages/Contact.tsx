@@ -120,7 +120,7 @@ export default function Contact() {
                     {
                       icon: Phone,
                       title: "Phone",
-                      info: "+234 800 000 0000",
+                      info: "08027798163 / 08035890705",
                       description: "Mon-Fri, 9am-5pm WAT",
                     },
                     {
