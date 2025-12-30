@@ -12,7 +12,7 @@ export function Footer() {
               <div className="w-10 h-10 rounded-full bg-honey-gradient flex items-center justify-center">
                 <span className="text-xl">🍯</span>
               </div>
-              <span className="font-display text-xl font-bold">AB Sardauna</span>
+              <span className="font-display text-xl font-bold">AB Sardauna Ngurdam</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Makers of Ngurdam Pure Honey – sourced directly from Nigerian apiaries. 
@@ -59,7 +59,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
-                info@absardauna.com
+                sardaunannigeria@gmail.com
               </li>
               <li className="flex items-start gap-2 text-muted-foreground">
                 <Phone className="w-4 h-4 mt-0.5" />
@@ -67,14 +67,14 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4 mt-0.5" />
-                <span>Lagos, Nigeria</span>
+                <span>Sokoto, Nigeria</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} AB Sardauna. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} AB Sardauna Ngurdam Ventures. All rights reserved.</p>
         </div>
       </div>
     </footer>
