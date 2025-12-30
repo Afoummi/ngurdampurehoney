@@ -114,7 +114,7 @@ export default function Contact() {
                     {
                       icon: Mail,
                       title: "Email",
-                      info: "info@absardauna.com",
+                      info: "sardaunannigeria@gmail.com",
                       description: "We reply within 24 hours",
                     },
                     {
@@ -126,7 +126,7 @@ export default function Contact() {
                     {
                       icon: MapPin,
                       title: "Address",
-                      info: "Lagos, Nigeria",
+                      info: "Sokoto, Nigeria",
                       description: "Visit by appointment",
                     },
                     {
