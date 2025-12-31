@@ -177,15 +177,13 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
       clearCart();
 
       // Show success message
-      toast.success("Order placed successfully!", {
-        description: "Redirecting you to WhatsApp to confirm your order...",
-      });
+      toast.success("Order placed successfully!");
 
-      // Short delay before redirect
-      setTimeout(() => {
-        window.open(whatsappUrl, "_blank");
-        navigate("/");
-      }, 1000);
+      // Open WhatsApp in new tab
+      window.open(whatsappUrl, "_blank");
+      
+      // Navigate to confirmation page
+      navigate(`/order-confirmation?orderId=${order.id}`);
 
     } catch (error) {
       console.error("Error placing order:", error);

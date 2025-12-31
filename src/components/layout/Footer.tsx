@@ -46,10 +46,10 @@ export function Footer() {
           <div>
             <h3 className="font-display font-semibold mb-4">Customer Service</h3>
             <ul className="space-y-2 text-sm">
+              <li><Link to="/track-order" className="text-muted-foreground hover:text-primary transition-colors">Track Order</Link></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Shipping Info</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Returns & Refunds</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">FAQs</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a></li>
             </ul>
           </div>
 

@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Menu, User, LogOut, ShoppingBag, Settings } from "lucide-react";
+import { Menu, User, LogOut, ShoppingBag, Settings, Package } from "lucide-react";
 import { useState } from "react";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { useAuth } from "@/hooks/useAuth";
@@ -71,6 +71,10 @@ export function Navbar() {
                 <DropdownMenuItem onClick={() => navigate("/account/orders")}>
                   <ShoppingBag className="h-4 w-4 mr-2" />
                   My Orders
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/track-order")}>
+                  <Package className="h-4 w-4 mr-2" />
+                  Track Order
                 </DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem onClick={() => navigate("/admin")}>
