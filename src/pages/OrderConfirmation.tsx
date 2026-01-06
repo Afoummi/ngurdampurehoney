@@ -22,16 +22,16 @@ interface OrderItem {
 
 interface Order {
   id: string;
-  customer_name: string;
-  customer_email: string;
-  customer_phone: string;
-  shipping_address: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: string;
   items: OrderItem[];
-  total_amount: number;
+  totalAmount: number;
   currency: string;
   status: string;
-  payment_status: string;
-  created_at: string;
+  paymentStatus: string;
+  createdAt: string;
   notes?: string;
 }
 
@@ -50,6 +50,7 @@ export default function OrderConfirmation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
+  const accessToken = searchParams.get("token");
   
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,20 +68,34 @@ export default function OrderConfirmation() {
     if (!orderId) return;
     
     try {
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("id", orderId)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      if (data) {
-        setOrder({
-          ...data,
-          items: typeof data.items === "string" ? JSON.parse(data.items) : data.items,
-        });
+      // Use secure edge function with access token
+      const session = await supabase.auth.getSession();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (session.data.session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.data.session.access_token}`;
       }
+
+      const queryParams = new URLSearchParams({ orderId });
+      if (accessToken) {
+        queryParams.set('token', accessToken);
+      }
+
+      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-order?${queryParams.toString()}`;
+      
+      const res = await fetch(functionUrl, {
+        method: 'GET',
+        headers,
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error || 'Failed to fetch order');
+      }
+
+      setOrder(result.order);
     } catch (error) {
       console.error("Error fetching order:", error);
       toast.error("Could not load order details");
@@ -142,7 +157,7 @@ export default function OrderConfirmation() {
             Order Confirmed!
           </h1>
           <p className="text-muted-foreground">
-            Thank you for your order, {order.customer_name.split(" ")[0]}!
+            Thank you for your order, {order.customerName.split(" ")[0]}!
           </p>
         </div>
 
@@ -184,7 +199,7 @@ export default function OrderConfirmation() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              Placed on {format(new Date(order.created_at), "MMMM dd, yyyy 'at' h:mm a")}
+              Placed on {format(new Date(order.createdAt), "MMMM dd, yyyy 'at' h:mm a")}
             </p>
           </CardContent>
         </Card>
@@ -217,7 +232,7 @@ export default function OrderConfirmation() {
             <div className="flex justify-between items-center">
               <span className="font-bold text-lg">Total</span>
               <span className="font-bold text-xl text-primary">
-                {order.currency} {Number(order.total_amount).toLocaleString()}
+                {order.currency} {Number(order.totalAmount).toLocaleString()}
               </span>
             </div>
           </CardContent>
@@ -231,19 +246,19 @@ export default function OrderConfirmation() {
           <CardContent className="space-y-3">
             <div>
               <p className="text-sm text-muted-foreground">Name</p>
-              <p className="font-medium">{order.customer_name}</p>
+              <p className="font-medium">{order.customerName}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Phone</p>
-              <p className="font-medium">{order.customer_phone}</p>
+              <p className="font-medium">{order.customerPhone}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{order.customer_email}</p>
+              <p className="font-medium">{order.customerEmail}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Delivery Address</p>
-              <p className="font-medium">{order.shipping_address}</p>
+              <p className="font-medium">{order.shippingAddress}</p>
             </div>
             {order.notes && (
               <div>

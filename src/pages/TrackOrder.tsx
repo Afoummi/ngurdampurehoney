@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -23,15 +23,15 @@ interface OrderItem {
 
 interface Order {
   id: string;
-  customer_name: string;
-  customer_email: string;
+  customerName: string;
+  customerEmail: string;
   items: OrderItem[];
-  total_amount: number;
+  totalAmount: number;
   currency: string;
   status: string;
-  payment_status: string;
-  created_at: string;
-  shipping_address: string;
+  paymentStatus: string;
+  createdAt: string;
+  shippingAddress: string;
 }
 
 const statusSteps = [
@@ -64,11 +64,20 @@ export default function TrackOrder() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialOrderId = searchParams.get("orderId") || "";
+  const initialToken = searchParams.get("token") || "";
   
   const [orderId, setOrderId] = useState(initialOrderId);
+  const [accessToken, setAccessToken] = useState(initialToken);
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+  // Auto-search if orderId is in URL
+  useEffect(() => {
+    if (initialOrderId) {
+      handleSearch();
+    }
+  }, []);
 
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -82,22 +91,52 @@ export default function TrackOrder() {
     setHasSearched(true);
 
     try {
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("id", orderId.trim())
-        .maybeSingle();
+      // Use secure edge function with optional access token
+      const { data, error } = await supabase.functions.invoke('get-order', {
+        body: null,
+        headers: {},
+      });
 
-      if (error) throw error;
-
-      if (data) {
-        setOrder({
-          ...data,
-          items: typeof data.items === "string" ? JSON.parse(data.items) : data.items,
-        });
-      } else {
-        setOrder(null);
+      // Build URL with query params for GET-style request
+      const queryParams = new URLSearchParams({ orderId: orderId.trim() });
+      if (accessToken) {
+        queryParams.set('token', accessToken);
       }
+
+      const response = await supabase.functions.invoke('get-order', {
+        method: 'GET',
+      });
+
+      // Fallback: call with fetch directly since invoke doesn't support query params well
+      const session = await supabase.auth.getSession();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (session.data.session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.data.session.access_token}`;
+      }
+
+      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-order?orderId=${encodeURIComponent(orderId.trim())}${accessToken ? `&token=${encodeURIComponent(accessToken)}` : ''}`;
+      
+      const res = await fetch(functionUrl, {
+        method: 'GET',
+        headers,
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        if (res.status === 403) {
+          toast.error("You don't have permission to view this order");
+        } else if (res.status === 404) {
+          setOrder(null);
+        } else {
+          throw new Error(result.error || 'Failed to fetch order');
+        }
+        return;
+      }
+
+      setOrder(result.order);
     } catch (error) {
       console.error("Error fetching order:", error);
       setOrder(null);
@@ -142,27 +181,41 @@ export default function TrackOrder() {
         {/* Search Form */}
         <Card className="mb-8">
           <CardContent className="pt-6">
-            <form onSubmit={handleSearch} className="flex gap-3">
-              <div className="flex-1">
-                <Label htmlFor="orderId" className="sr-only">Order ID</Label>
+            <form onSubmit={handleSearch} className="space-y-4">
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <Label htmlFor="orderId" className="sr-only">Order ID</Label>
+                  <Input
+                    id="orderId"
+                    placeholder="Enter your order ID"
+                    value={orderId}
+                    onChange={(e) => setOrderId(e.target.value)}
+                    className="h-12"
+                  />
+                </div>
+                <Button type="submit" size="lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Search className="w-5 h-5 mr-2" />
+                      Track
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div>
+                <Label htmlFor="accessToken" className="text-sm text-muted-foreground">
+                  Access Token (for guest orders)
+                </Label>
                 <Input
-                  id="orderId"
-                  placeholder="Enter your order ID (e.g., abc12345)"
-                  value={orderId}
-                  onChange={(e) => setOrderId(e.target.value)}
-                  className="h-12"
+                  id="accessToken"
+                  placeholder="Enter access token if provided"
+                  value={accessToken}
+                  onChange={(e) => setAccessToken(e.target.value)}
+                  className="mt-1"
                 />
               </div>
-              <Button type="submit" size="lg" disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <Search className="w-5 h-5 mr-2" />
-                    Track
-                  </>
-                )}
-              </Button>
             </form>
           </CardContent>
         </Card>
@@ -174,7 +227,7 @@ export default function TrackOrder() {
               <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Order Not Found</h3>
               <p className="text-muted-foreground mb-4">
-                We couldn't find an order with that ID. Please check and try again.
+                We couldn't find an order with that ID. Please check and try again, or provide your access token.
               </p>
               <Button variant="outline" onClick={openWhatsApp}>
                 <MessageCircle className="w-4 h-4 mr-2" />
@@ -196,15 +249,15 @@ export default function TrackOrder() {
                       Order #{order.id.slice(0, 8).toUpperCase()}
                     </CardTitle>
                     <CardDescription>
-                      Placed on {format(new Date(order.created_at), "MMMM dd, yyyy")}
+                      Placed on {format(new Date(order.createdAt), "MMMM dd, yyyy")}
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
                     <Badge variant="outline" className={statusColors[order.status]}>
                       {order.status}
                     </Badge>
-                    <Badge variant="outline" className={paymentStatusColors[order.payment_status]}>
-                      {order.payment_status}
+                    <Badge variant="outline" className={paymentStatusColors[order.paymentStatus]}>
+                      {order.paymentStatus}
                     </Badge>
                   </div>
                 </div>
@@ -306,7 +359,7 @@ export default function TrackOrder() {
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg">Total</span>
                   <span className="font-bold text-xl text-primary">
-                    {order.currency} {Number(order.total_amount).toLocaleString()}
+                    {order.currency} {Number(order.totalAmount).toLocaleString()}
                   </span>
                 </div>
               </CardContent>
@@ -318,7 +371,7 @@ export default function TrackOrder() {
                 <CardTitle className="font-display text-lg">Delivery Address</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{order.shipping_address}</p>
+                <p className="text-muted-foreground">{order.shippingAddress}</p>
               </CardContent>
             </Card>
 
