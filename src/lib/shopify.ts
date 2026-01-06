@@ -1,9 +1,5 @@
 import { toast } from "sonner";
-
-const SHOPIFY_API_VERSION = '2025-07';
-const SHOPIFY_STORE_PERMANENT_DOMAIN = 'lovable-project-w35b3.myshopify.com';
-const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-const SHOPIFY_STOREFRONT_TOKEN = '45c2b9f772d0196af9a4a62e51d80a46';
+import { supabase } from "@/integrations/supabase/client";
 
 export interface ShopifyProduct {
   node: {
@@ -49,33 +45,30 @@ export interface ShopifyProduct {
   };
 }
 
+// Proxy all Shopify requests through edge function for security
 export async function storefrontApiRequest(query: string, variables: Record<string, unknown> = {}) {
-  const response = await fetch(SHOPIFY_STOREFRONT_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
+  const { data, error } = await supabase.functions.invoke('shopify-storefront', {
+    body: { query, variables },
   });
 
-  if (response.status === 402) {
-    toast.error("Shopify: Payment required", {
-      description: "Shopify API access requires an active Shopify billing plan.",
+  if (error) {
+    console.error('Shopify API error:', error);
+    toast.error("Failed to fetch products", {
+      description: "Please try again later.",
     });
     return null;
   }
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  if (data?.error) {
+    if (data.error.includes('402') || data.error.includes('billing')) {
+      toast.error("Shopify: Payment required", {
+        description: "Shopify API access requires an active Shopify billing plan.",
+      });
+    }
+    return null;
   }
 
-  const data = await response.json();
-  
-  if (data.errors) {
+  if (data?.errors) {
     throw new Error(`Error calling Shopify: ${data.errors.map((e: { message: string }) => e.message).join(', ')}`);
   }
 

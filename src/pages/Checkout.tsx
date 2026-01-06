@@ -25,7 +25,7 @@ const checkoutSchema = z.object({
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
-const WHATSAPP_NUMBER = "2348027798163"; // Primary business number
+const WHATSAPP_NUMBER = "2348027798163";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -60,7 +60,7 @@ export default function Checkout() {
           .from("profiles")
           .select("full_name, phone, address")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
         
         if (data) {
           setFormData(prev => ({
@@ -96,9 +96,9 @@ export default function Checkout() {
     return true;
   };
 
-  const formatWhatsAppMessage = (orderId: string): string => {
+  const formatWhatsAppMessage = (orderId: string, total: number, currency: string): string => {
     const itemsList = items.map(item => 
-      `• ${item.product.node.title} (${item.selectedOptions.map(o => o.value).join(", ")}) x${item.quantity} - ${currencyCode} ${(parseFloat(item.price.amount) * item.quantity).toFixed(2)}`
+      `• ${item.product.node.title} (${item.selectedOptions.map(o => o.value).join(", ")}) x${item.quantity}`
     ).join("\n");
 
     const message = `🍯 *New Order from AB Sardauna Ngurdam*
@@ -116,7 +116,7 @@ ${formData.address}
 *Order Items:*
 ${itemsList}
 
-*Total Amount:* ${currencyCode} ${totalPrice.toFixed(2)}
+*Total Amount:* ${currency} ${total.toFixed(2)}
 
 ${formData.notes ? `*Notes:* ${formData.notes}` : ""}
 
@@ -136,41 +136,38 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
     setIsLoading(true);
 
     try {
-      // Prepare order items
+      // Prepare order items for server validation (only send variantId and quantity)
       const orderItems = items.map(item => ({
-        productId: item.product.node.id,
-        productTitle: item.product.node.title,
         variantId: item.variantId,
-        variantTitle: item.variantTitle,
         quantity: item.quantity,
-        price: parseFloat(item.price.amount),
-        currencyCode: item.price.currencyCode,
         selectedOptions: item.selectedOptions,
       }));
 
-      // Save order to database
-      const { data: order, error } = await supabase
-        .from("orders")
-        .insert({
-          customer_name: formData.name,
-          customer_email: formData.email,
-          customer_phone: formData.phone,
-          shipping_address: formData.address,
-          notes: formData.notes || null,
+      // Call secure edge function for server-side price validation
+      const { data, error } = await supabase.functions.invoke('create-order', {
+        body: {
           items: orderItems,
-          total_amount: totalPrice,
-          currency: currencyCode,
-          user_id: user?.id || null,
-          status: "pending",
-          payment_status: "pending",
-        })
-        .select("id")
-        .single();
+          customerInfo: {
+            customerName: formData.name.trim(),
+            customerEmail: formData.email.trim().toLowerCase(),
+            customerPhone: formData.phone.trim(),
+            shippingAddress: formData.address.trim(),
+            notes: formData.notes?.trim() || null,
+            userId: user?.id || null,
+          },
+        },
+      });
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
+      
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to create order');
+      }
 
-      // Format WhatsApp message and redirect
-      const whatsappMessage = formatWhatsAppMessage(order.id);
+      const { order } = data;
+
+      // Format WhatsApp message with server-verified prices
+      const whatsappMessage = formatWhatsAppMessage(order.id, order.totalAmount, order.currency);
       const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
 
       // Clear cart
@@ -182,13 +179,14 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
       // Open WhatsApp in new tab
       window.open(whatsappUrl, "_blank");
       
-      // Navigate to confirmation page
-      navigate(`/order-confirmation?orderId=${order.id}`);
+      // Navigate to confirmation page with access token for guest tracking
+      const confirmUrl = `/order-confirmation?orderId=${order.id}&token=${order.accessToken}`;
+      navigate(confirmUrl);
 
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error("Failed to place order", {
-        description: "Please try again or contact us directly on WhatsApp.",
+        description: error instanceof Error ? error.message : "Please try again or contact us directly on WhatsApp.",
       });
     } finally {
       setIsLoading(false);
