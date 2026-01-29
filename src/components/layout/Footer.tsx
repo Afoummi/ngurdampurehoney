@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { NewsletterForm } from "@/components/newsletter/NewsletterForm";
 
 export function Footer() {
   return (
     <footer className="bg-card border-t border-border">
       <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="space-y-4 lg:col-span-2">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-honey-gradient flex items-center justify-center">
                 <span className="text-xl">🍯</span>
@@ -18,7 +19,17 @@ export function Footer() {
               Makers of Ngurdam Pure Honey – sourced directly from Nigerian apiaries. 
               Experience the golden sweetness of nature.
             </p>
-            <div className="flex gap-4">
+            
+            {/* Newsletter */}
+            <div className="pt-2">
+              <h4 className="font-medium text-sm mb-2">Subscribe to our newsletter</h4>
+              <NewsletterForm />
+              <p className="text-xs text-muted-foreground mt-2">
+                Get updates on new products & exclusive offers.
+              </p>
+            </div>
+
+            <div className="flex gap-4 pt-2">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
