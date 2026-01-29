@@ -5,12 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LogOut, Package, Users, ShoppingCart, Settings, Bell } from "lucide-react";
+import { Loader2, LogOut, Package, Users, ShoppingCart, Settings, Bell, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 import { OrdersTab } from "@/components/admin/OrdersTab";
 import { CustomersTab } from "@/components/admin/CustomersTab";
 import { SettingsTab } from "@/components/admin/SettingsTab";
 import { ProductsTab } from "@/components/admin/ProductsTab";
+import { PromoTab } from "@/components/admin/PromoTab";
 
 interface DashboardStats {
   totalOrders: number;
@@ -226,6 +227,10 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4" />
               Customers
             </TabsTrigger>
+            <TabsTrigger value="promo" className="gap-2">
+              <Megaphone className="h-4 w-4" />
+              Promo
+            </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="h-4 w-4" />
               Settings
@@ -242,6 +247,10 @@ export default function AdminDashboard() {
           
           <TabsContent value="customers">
             <CustomersTab />
+          </TabsContent>
+
+          <TabsContent value="promo">
+            <PromoTab />
           </TabsContent>
           
           <TabsContent value="settings">
