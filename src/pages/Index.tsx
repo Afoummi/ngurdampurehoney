@@ -4,6 +4,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { CTASection } from "@/components/home/CTASection";
+import { PromoBanner } from "@/components/home/PromoBanner";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { ArrowRight } from "lucide-react";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <PromoBanner />
       <Navbar />
       <main className="flex-1">
         <HeroSection />
