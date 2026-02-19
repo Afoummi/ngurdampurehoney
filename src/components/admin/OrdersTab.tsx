@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Eye, Package } from "lucide-react";
+import { Loader2, Eye, Package, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -98,6 +98,60 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  const printReceipt = (order: Order) => {
+    const receiptWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!receiptWindow) return;
+
+    const itemsHtml = order.items.map((item: any) => `
+      <tr>
+        <td style="padding:6px 0;border-bottom:1px solid #eee;">${item.title || item.name || item.productTitle}${item.variantTitle ? ` (${item.variantTitle})` : ''}</td>
+        <td style="padding:6px 0;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
+        <td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right;">₦${(Number(item.price) * item.quantity).toLocaleString()}</td>
+      </tr>
+    `).join('');
+
+    receiptWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Receipt - ${order.id.slice(0,8).toUpperCase()}</title></head>
+      <body style="font-family:Arial,sans-serif;max-width:380px;margin:0 auto;padding:20px;color:#333;">
+        <div style="text-align:center;margin-bottom:20px;">
+          <h2 style="margin:0;">Ngurdama Pure Honey</h2>
+          <p style="margin:4px 0;color:#666;font-size:13px;">Order Receipt</p>
+        </div>
+        <hr style="border:none;border-top:2px dashed #ccc;margin:16px 0;">
+        <p style="font-size:13px;"><strong>Order ID:</strong> ${order.id.slice(0,8).toUpperCase()}</p>
+        <p style="font-size:13px;"><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString('en-NG', { year:'numeric', month:'long', day:'numeric' })}</p>
+        <p style="font-size:13px;"><strong>Status:</strong> ${order.status} | <strong>Payment:</strong> ${order.payment_status}</p>
+        <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
+        <p style="font-size:13px;"><strong>Customer:</strong> ${order.customer_name}</p>
+        <p style="font-size:13px;"><strong>Email:</strong> ${order.customer_email}</p>
+        ${order.customer_phone ? `<p style="font-size:13px;"><strong>Phone:</strong> ${order.customer_phone}</p>` : ''}
+        <p style="font-size:13px;"><strong>Address:</strong> ${order.shipping_address}</p>
+        ${order.notes ? `<p style="font-size:13px;"><strong>Notes:</strong> ${order.notes}</p>` : ''}
+        <hr style="border:none;border-top:2px dashed #ccc;margin:16px 0;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="border-bottom:2px solid #333;">
+              <th style="text-align:left;padding:6px 0;">Item</th>
+              <th style="text-align:center;padding:6px 0;">Qty</th>
+              <th style="text-align:right;padding:6px 0;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+        <div style="margin-top:12px;text-align:right;font-size:16px;font-weight:bold;">
+          Total: ₦${Number(order.total_amount).toLocaleString()}
+        </div>
+        <hr style="border:none;border-top:2px dashed #ccc;margin:16px 0;">
+        <p style="text-align:center;font-size:12px;color:#999;">Thank you for your purchase!</p>
+        <script>window.onload=function(){window.print();}</script>
+      </body>
+      </html>
+    `);
+    receiptWindow.document.close();
   };
 
   const updatePaymentStatus = async (orderId: string, payment_status: string) => {
@@ -242,6 +296,12 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
                             <span className="font-bold text-lg">₦{Number(order.total_amount).toLocaleString()}</span>
                           </div>
                         </div>
+
+                        {/* Print Receipt */}
+                        <Button variant="outline" className="w-full" onClick={() => printReceipt(order)}>
+                          <Printer className="h-4 w-4 mr-2" />
+                          Print Receipt
+                        </Button>
 
                         {/* Status Updates */}
                         <div className="grid grid-cols-2 gap-4">
