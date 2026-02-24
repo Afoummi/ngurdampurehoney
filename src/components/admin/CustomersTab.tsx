@@ -3,8 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Users } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Customer {
   id: string;
@@ -16,9 +19,14 @@ interface Customer {
   role: string;
 }
 
-export function CustomersTab() {
+interface CustomersTabProps {
+  canManageRoles?: boolean;
+}
+
+export function CustomersTab({ canManageRoles = false }: CustomersTabProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     fetchCustomers();
@@ -26,7 +34,6 @@ export function CustomersTab() {
 
   const fetchCustomers = async () => {
     try {
-      // Fetch profiles with roles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -34,20 +41,15 @@ export function CustomersTab() {
 
       if (profilesError) throw profilesError;
 
-      // Fetch roles for each user
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
 
       if (rolesError) throw rolesError;
 
-      // Merge data
       const customersWithRoles = (profiles || []).map(profile => {
         const userRole = roles?.find(r => r.user_id === profile.user_id);
-        return {
-          ...profile,
-          role: userRole?.role || 'customer'
-        };
+        return { ...profile, role: userRole?.role || 'customer' };
       });
 
       setCustomers(customersWithRoles);
@@ -56,6 +58,48 @@ export function CustomersTab() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    if (userId === currentUser?.id) {
+      toast.error("You cannot change your own role");
+      return;
+    }
+
+    try {
+      const typedRole = newRole as "admin" | "moderator" | "customer";
+      
+      const { data: existingRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingRole) {
+        const { error } = await supabase
+          .from('user_roles')
+          .update({ role: typedRole })
+          .eq('user_id', userId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('user_roles')
+          .insert([{ user_id: userId, role: typedRole }]);
+        if (error) throw error;
+      }
+
+      toast.success(`Role updated to ${newRole}`);
+      fetchCustomers();
+    } catch (error) {
+      console.error('Error updating role:', error);
+      toast.error("Failed to update role");
+    }
+  };
+
+  const roleColors: Record<string, string> = {
+    admin: "bg-red-500/10 text-red-600",
+    moderator: "bg-blue-500/10 text-blue-600",
+    customer: "bg-green-500/10 text-green-600",
   };
 
   if (isLoading) {
@@ -81,8 +125,8 @@ export function CustomersTab() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Customers</CardTitle>
-        <CardDescription>View and manage registered customers</CardDescription>
+        <CardTitle>Users</CardTitle>
+        <CardDescription>View and manage registered users</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -100,6 +144,9 @@ export function CustomersTab() {
               <TableRow key={customer.id}>
                 <TableCell className="font-medium">
                   {customer.full_name || 'Not provided'}
+                  {customer.user_id === currentUser?.id && (
+                    <span className="text-xs text-muted-foreground ml-1">(You)</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {customer.phone || 'Not provided'}
@@ -108,9 +155,22 @@ export function CustomersTab() {
                   {customer.address || 'Not provided'}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={customer.role === 'admin' ? 'default' : 'secondary'}>
-                    {customer.role}
-                  </Badge>
+                  {canManageRoles && customer.user_id !== currentUser?.id ? (
+                    <Select value={customer.role} onValueChange={(value) => handleRoleChange(customer.user_id, value)}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="customer">Customer</SelectItem>
+                        <SelectItem value="moderator">Moderator</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Badge variant="outline" className={roleColors[customer.role] || ""}>
+                      {customer.role}
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {format(new Date(customer.created_at), 'MMM dd, yyyy')}

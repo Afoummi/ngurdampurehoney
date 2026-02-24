@@ -2,51 +2,48 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
-import { ShopifyProduct } from "@/lib/shopify";
+import { Product, formatPrice } from "@/lib/products";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 
 interface ProductCardProps {
-  product: ShopifyProduct;
+  product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
-  const { node } = product;
-  
-  const firstVariant = node.variants.edges[0]?.node;
-  const firstImage = node.images.edges[0]?.node;
-  const price = node.priceRange.minVariantPrice;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!firstVariant) return;
+
+    if (product.stock <= 0) {
+      toast.error("Out of stock");
+      return;
+    }
 
     addItem({
-      product,
-      variantId: firstVariant.id,
-      variantTitle: firstVariant.title,
-      price: firstVariant.price,
+      productId: product.id,
+      productName: product.name,
+      price: product.price,
       quantity: 1,
-      selectedOptions: firstVariant.selectedOptions || [],
+      imageUrl: product.image_url,
     });
 
     toast.success("Added to cart", {
-      description: `${node.title} has been added to your cart.`,
+      description: `${product.name} has been added to your cart.`,
       position: "top-center",
     });
   };
 
   return (
-    <Link to={`/product/${node.handle}`}>
+    <Link to={`/product/${product.id}`}>
       <Card className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
         <div className="aspect-square overflow-hidden bg-secondary/20">
-          {firstImage ? (
+          {product.image_url ? (
             <img
-              src={firstImage.url}
-              alt={firstImage.altText || node.title}
+              src={product.image_url}
+              alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
@@ -58,23 +55,24 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardContent className="p-4 space-y-3">
           <div>
             <h3 className="font-display font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
-              {node.title}
+              {product.name}
             </h3>
             <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-              {node.description || "Pure natural honey from AB Sardauna."}
+              {product.description || "Pure natural honey from Ngurdam."}
             </p>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-primary">
-              {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
+              {formatPrice(product.price)}
             </span>
             <Button
               size="sm"
               onClick={handleAddToCart}
+              disabled={product.stock <= 0}
               className="bg-primary hover:bg-primary/90"
             >
               <ShoppingCart className="w-4 h-4 mr-1" />
-              Add
+              {product.stock <= 0 ? "Sold Out" : "Add"}
             </Button>
           </div>
         </CardContent>

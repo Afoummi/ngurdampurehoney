@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Menu, User, LogOut, ShoppingBag, Settings, Package } from "lucide-react";
+import { Menu, User, LogOut, ShoppingBag, Settings, Package, Shield } from "lucide-react";
 import { useState } from "react";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,7 +19,7 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, isModerator, signOut } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -33,21 +33,15 @@ export function Navbar() {
           <div className="w-10 h-10 rounded-full bg-honey-gradient flex items-center justify-center">
             <span className="text-xl font-bold text-primary-foreground">🍯</span>
           </div>
-          <span className="font-display text-xl font-bold text-foreground">AB Sardauna</span>
+          <span className="font-display text-xl font-bold text-foreground">Ngurdam Honey</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              to={link.href}
+            <Link key={link.href} to={link.href}
               className={`text-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === link.href
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              }`}
-            >
+                location.pathname === link.href ? "text-primary" : "text-muted-foreground"
+              }`}>
               {link.label}
             </Link>
           ))}
@@ -55,7 +49,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <CartDrawer />
-          
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -69,23 +63,24 @@ export function Navbar() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate("/account/orders")}>
-                  <ShoppingBag className="h-4 w-4 mr-2" />
-                  My Orders
+                  <ShoppingBag className="h-4 w-4 mr-2" /> My Orders
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/track-order")}>
-                  <Package className="h-4 w-4 mr-2" />
-                  Track Order
+                  <Package className="h-4 w-4 mr-2" /> Track Order
                 </DropdownMenuItem>
+                {isModerator && !isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate("/moderator")}>
+                    <Shield className="h-4 w-4 mr-2" /> Moderator Dashboard
+                  </DropdownMenuItem>
+                )}
                 {isAdmin && (
                   <DropdownMenuItem onClick={() => navigate("/admin")}>
-                    <Settings className="h-4 w-4 mr-2" />
-                    Admin Dashboard
+                    <Settings className="h-4 w-4 mr-2" /> Admin Dashboard
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
+                  <LogOut className="h-4 w-4 mr-2" /> Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -94,8 +89,7 @@ export function Navbar() {
               Sign In
             </Button>
           )}
-          
-          {/* Mobile Menu */}
+
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon">
@@ -105,61 +99,43 @@ export function Navbar() {
             <SheetContent side="right" className="w-[300px]">
               <nav className="flex flex-col gap-4 mt-8">
                 {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    onClick={() => setIsOpen(false)}
+                  <Link key={link.href} to={link.href} onClick={() => setIsOpen(false)}
                     className={`text-lg font-medium transition-colors hover:text-primary ${
-                      location.pathname === link.href
-                        ? "text-primary"
-                        : "text-muted-foreground"
-                    }`}
-                  >
+                      location.pathname === link.href ? "text-primary" : "text-muted-foreground"
+                    }`}>
                     {link.label}
                   </Link>
                 ))}
-                
+
                 {user ? (
                   <>
                     <div className="border-t pt-4 mt-4">
-                      <Link
-                        to="/account/orders"
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary"
-                      >
-                        <ShoppingBag className="h-5 w-5" />
-                        My Orders
+                      <Link to="/account/orders" onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
+                        <ShoppingBag className="h-5 w-5" /> My Orders
                       </Link>
                     </div>
-                    {isAdmin && (
-                      <Link
-                        to="/admin"
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary"
-                      >
-                        <Settings className="h-5 w-5" />
-                        Admin Dashboard
+                    {isModerator && !isAdmin && (
+                      <Link to="/moderator" onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
+                        <Shield className="h-5 w-5" /> Moderator Dashboard
                       </Link>
                     )}
-                    <button
-                      onClick={() => {
-                        handleSignOut();
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      Sign Out
+                    {isAdmin && (
+                      <Link to="/admin" onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
+                        <Settings className="h-5 w-5" /> Admin Dashboard
+                      </Link>
+                    )}
+                    <button onClick={() => { handleSignOut(); setIsOpen(false); }}
+                      className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
+                      <LogOut className="h-5 w-5" /> Sign Out
                     </button>
                   </>
                 ) : (
-                  <Link
-                    to="/auth"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 text-lg font-medium text-primary"
-                  >
-                    <User className="h-5 w-5" />
-                    Sign In
+                  <Link to="/auth" onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 text-lg font-medium text-primary">
+                    <User className="h-5 w-5" /> Sign In
                   </Link>
                 )}
               </nav>
