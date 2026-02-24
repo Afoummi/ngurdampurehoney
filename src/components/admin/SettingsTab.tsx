@@ -30,8 +30,7 @@ export function SettingsTab() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Store settings are managed through your Shopify dashboard. Products, inventory, and pricing 
-            are synced automatically from Shopify.
+            Products, inventory, and pricing are managed directly from the Products tab in this dashboard.
           </p>
         </CardContent>
       </Card>
@@ -43,7 +42,7 @@ export function SettingsTab() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            You will receive email notifications when customers place new orders. 
+            You will receive email notifications when customers place new orders.
             Real-time notifications also appear in this dashboard.
           </p>
         </CardContent>

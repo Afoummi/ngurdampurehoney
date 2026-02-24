@@ -15,6 +15,7 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import TrackOrder from "./pages/TrackOrder";
 import AdminDashboard from "./pages/admin/Dashboard";
+import ModeratorDashboard from "./pages/moderator/Dashboard";
 import CustomerOrders from "./pages/account/Orders";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
             <Route path="/track-order" element={<TrackOrder />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/moderator" element={<ModeratorDashboard />} />
             <Route path="/account/orders" element={<CustomerOrders />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -11,16 +11,17 @@ import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cartStore";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { formatPrice } from "@/lib/products";
 import { toast } from "sonner";
 import { Loader2, MessageCircle, ShoppingBag, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 
 const checkoutSchema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
-  email: z.string().trim().email("Please enter a valid email address").max(255, "Email is too long"),
-  phone: z.string().trim().min(10, "Please enter a valid phone number").max(20, "Phone number is too long"),
-  address: z.string().trim().min(10, "Please enter your full delivery address").max(500, "Address is too long"),
-  notes: z.string().max(1000, "Notes are too long").optional(),
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
+  email: z.string().trim().email("Please enter a valid email address").max(255),
+  phone: z.string().trim().min(10, "Please enter a valid phone number").max(20),
+  address: z.string().trim().min(10, "Please enter your full delivery address").max(500),
+  notes: z.string().max(1000).optional(),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -33,26 +34,17 @@ export default function Checkout() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
-  
+
   const [formData, setFormData] = useState<CheckoutFormData>({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    notes: "",
+    name: "", email: "", phone: "", address: "", notes: "",
   });
 
-  const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
-  const currencyCode = items[0]?.price.currencyCode || "NGN";
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Redirect if cart is empty
   useEffect(() => {
-    if (items.length === 0) {
-      navigate("/products");
-    }
+    if (items.length === 0) navigate("/products");
   }, [items, navigate]);
 
-  // Pre-fill form if user is logged in
   useEffect(() => {
     if (user) {
       const fetchProfile = async () => {
@@ -61,7 +53,7 @@ export default function Checkout() {
           .select("full_name, phone, address")
           .eq("user_id", user.id)
           .maybeSingle();
-        
+
         if (data) {
           setFormData(prev => ({
             ...prev,
@@ -71,10 +63,7 @@ export default function Checkout() {
             address: data.address || prev.address,
           }));
         } else {
-          setFormData(prev => ({
-            ...prev,
-            email: user.email || prev.email,
-          }));
+          setFormData(prev => ({ ...prev, email: user.email || prev.email }));
         }
       };
       fetchProfile();
@@ -96,12 +85,12 @@ export default function Checkout() {
     return true;
   };
 
-  const formatWhatsAppMessage = (orderId: string, total: number, currency: string): string => {
-    const itemsList = items.map(item => 
-      `• ${item.product.node.title} (${item.selectedOptions.map(o => o.value).join(", ")}) x${item.quantity}`
+  const formatWhatsAppMessage = (orderId: string): string => {
+    const itemsList = items.map(item =>
+      `• ${item.productName} x${item.quantity}`
     ).join("\n");
 
-    const message = `🍯 *New Order from AB Sardauna Ngurdam*
+    const message = `🍯 *New Order from Ngurdam Pure Honey*
 
 *Order ID:* ${orderId}
 
@@ -116,7 +105,7 @@ ${formData.address}
 *Order Items:*
 ${itemsList}
 
-*Total Amount:* ${currency} ${total.toFixed(2)}
+*Total Amount:* ${formatPrice(totalPrice)}
 
 ${formData.notes ? `*Notes:* ${formData.notes}` : ""}
 
@@ -127,23 +116,20 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) {
       toast.error("Please fix the errors in the form");
       return;
     }
 
     setIsLoading(true);
-
     try {
-      // Prepare order items for server validation (only send variantId and quantity)
       const orderItems = items.map(item => ({
-        variantId: item.variantId,
+        productId: item.productId,
+        productName: item.productName,
         quantity: item.quantity,
-        selectedOptions: item.selectedOptions,
+        price: item.price,
       }));
 
-      // Call secure edge function for server-side price validation
       const { data, error } = await supabase.functions.invoke('create-order', {
         body: {
           items: orderItems,
@@ -159,56 +145,37 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
       });
 
       if (error) throw new Error(error.message);
-      
-      if (!data?.success) {
-        throw new Error(data?.error || 'Failed to create order');
-      }
+      if (!data?.success) throw new Error(data?.error || 'Failed to create order');
 
       const { order } = data;
-
-      // Format WhatsApp message with server-verified prices
-      const whatsappMessage = formatWhatsAppMessage(order.id, order.totalAmount, order.currency);
+      const whatsappMessage = formatWhatsAppMessage(order.id);
       const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
 
-      // Clear cart
       clearCart();
-
-      // Show success message
       toast.success("Order placed successfully!");
-
-      // Open WhatsApp in new tab
       window.open(whatsappUrl, "_blank");
-      
-      // Navigate to confirmation page with access token for guest tracking
+
       const confirmUrl = `/order-confirmation?orderId=${order.id}&token=${order.accessToken}`;
       navigate(confirmUrl);
-
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error("Failed to place order", {
-        description: error instanceof Error ? error.message : "Please try again or contact us directly on WhatsApp.",
+        description: error instanceof Error ? error.message : "Please try again.",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (items.length === 0) {
-    return null;
-  }
+  if (items.length === 0) return null;
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 py-8 md:py-12">
         <div className="container max-w-4xl">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
 
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">
@@ -216,7 +183,6 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
           </h1>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Order Form */}
             <div className="md:col-span-2">
               <Card>
                 <CardHeader>
@@ -227,84 +193,52 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name">Full Name *</Label>
-                        <Input
-                          id="name"
-                          placeholder="Your full name"
-                          value={formData.name}
+                        <Input id="name" placeholder="Your full name" value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className={errors.name ? "border-destructive" : ""}
-                        />
+                          className={errors.name ? "border-destructive" : ""} />
                         {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="phone">Phone Number *</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          placeholder="08012345678"
-                          value={formData.phone}
+                        <Input id="phone" type="tel" placeholder="08012345678" value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          className={errors.phone ? "border-destructive" : ""}
-                        />
+                          className={errors.phone ? "border-destructive" : ""} />
                         {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={formData.email}
+                      <Input id="email" type="email" placeholder="your@email.com" value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className={errors.email ? "border-destructive" : ""}
-                      />
+                        className={errors.email ? "border-destructive" : ""} />
                       {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="address">Delivery Address *</Label>
-                      <Textarea
-                        id="address"
-                        placeholder="Enter your full delivery address including city and state"
-                        rows={3}
+                      <Textarea id="address" placeholder="Enter your full delivery address" rows={3}
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        className={errors.address ? "border-destructive" : ""}
-                      />
+                        className={errors.address ? "border-destructive" : ""} />
                       {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="notes">Order Notes (Optional)</Label>
-                      <Textarea
-                        id="notes"
-                        placeholder="Any special instructions for your order..."
-                        rows={2}
+                      <Textarea id="notes" placeholder="Any special instructions..." rows={2}
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        className={errors.notes ? "border-destructive" : ""}
-                      />
+                        className={errors.notes ? "border-destructive" : ""} />
                       {errors.notes && <p className="text-sm text-destructive">{errors.notes}</p>}
                     </div>
 
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white"
-                      disabled={isLoading}
-                    >
+                    <Button type="submit" size="lg" className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white"
+                      disabled={isLoading}>
                       {isLoading ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Placing Order...
-                        </>
+                        <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Placing Order...</>
                       ) : (
-                        <>
-                          <MessageCircle className="w-5 h-5 mr-2" />
-                          Place Order via WhatsApp
-                        </>
+                        <><MessageCircle className="w-5 h-5 mr-2" /> Place Order via WhatsApp</>
                       )}
                     </Button>
 
@@ -316,57 +250,46 @@ I would like to confirm this order and arrange for payment and delivery. Thank y
               </Card>
             </div>
 
-            {/* Order Summary */}
             <div>
               <Card className="sticky top-4">
                 <CardHeader>
                   <CardTitle className="font-display flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5" />
-                    Order Summary
+                    <ShoppingBag className="w-5 h-5" /> Order Summary
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {items.map((item) => (
-                    <div key={item.variantId} className="flex gap-3">
+                    <div key={item.productId} className="flex gap-3">
                       <div className="w-12 h-12 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0">
-                        {item.product.node.images?.edges?.[0]?.node && (
-                          <img
-                            src={item.product.node.images.edges[0].node.url}
-                            alt={item.product.node.title}
-                            className="w-full h-full object-cover"
-                          />
+                        {item.imageUrl ? (
+                          <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-lg">🍯</div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{item.product.node.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {item.selectedOptions.map(o => o.value).join(" • ")} × {item.quantity}
-                        </p>
+                        <p className="font-medium text-sm truncate">{item.productName}</p>
+                        <p className="text-xs text-muted-foreground">× {item.quantity}</p>
                         <p className="text-sm font-semibold text-primary">
-                          {currencyCode} {(parseFloat(item.price.amount) * item.quantity).toFixed(2)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     </div>
                   ))}
 
                   <Separator />
-
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Subtotal</span>
-                    <span>{currencyCode} {totalPrice.toFixed(2)}</span>
+                    <span>{formatPrice(totalPrice)}</span>
                   </div>
                   <div className="flex justify-between items-center text-muted-foreground">
                     <span>Shipping</span>
                     <span>Calculated on WhatsApp</span>
                   </div>
-
                   <Separator />
-
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold">Total</span>
-                    <span className="text-xl font-bold text-primary">
-                      {currencyCode} {totalPrice.toFixed(2)}
-                    </span>
+                    <span className="text-xl font-bold text-primary">{formatPrice(totalPrice)}</span>
                   </div>
                 </CardContent>
               </Card>

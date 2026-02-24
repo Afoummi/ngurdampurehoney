@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ProductCard } from "./ProductCard";
-import { storefrontApiRequest, PRODUCTS_QUERY, ShopifyProduct } from "@/lib/shopify";
+import { Product, fetchProducts } from "@/lib/products";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Package } from "lucide-react";
 
@@ -9,26 +9,22 @@ interface ProductGridProps {
 }
 
 export function ProductGrid({ limit = 12 }: ProductGridProps) {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function load() {
       try {
-        const data = await storefrontApiRequest(PRODUCTS_QUERY, { first: limit });
-        if (data?.data?.products?.edges) {
-          setProducts(data.data.products.edges);
-        }
-      } catch (err) {
+        const data = await fetchProducts(limit);
+        setProducts(data);
+      } catch {
         setError("Failed to load products");
-        console.error(err);
       } finally {
         setLoading(false);
       }
     }
-
-    fetchProducts();
+    load();
   }, [limit]);
 
   if (loading) {
@@ -70,7 +66,7 @@ export function ProductGrid({ limit = 12 }: ProductGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product) => (
-        <ProductCard key={product.node.id} product={product} />
+        <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );
