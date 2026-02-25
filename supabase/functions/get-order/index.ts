@@ -55,7 +55,7 @@ serve(async (req) => {
     const { data: order, error } = await query.maybeSingle();
 
     if (error) {
-      console.error("Database error:", error);
+      console.error("Order fetch failed");
       throw new Error("Failed to fetch order");
     }
 
@@ -91,9 +91,14 @@ serve(async (req) => {
       }
     }
 
-    // Check access token for guest orders
+    // Check access token for guest orders (with 90-day expiration)
     if (!isAuthorized && accessToken && order.access_token === accessToken) {
-      isAuthorized = true;
+      const orderDate = new Date(order.created_at);
+      const now = new Date();
+      const daysSinceCreation = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSinceCreation <= 90) {
+        isAuthorized = true;
+      }
     }
 
     if (!isAuthorized) {
@@ -125,7 +130,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {
-    console.error("Error fetching order:", error);
+    console.error("Order fetch error");
     return new Response(
       JSON.stringify({
         success: false,

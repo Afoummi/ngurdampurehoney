@@ -78,7 +78,7 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Validated ${validatedItems.length} items, total: ₦${calculatedTotal}`);
+    console.log(`Validated ${validatedItems.length} items`);
 
     const accessToken = crypto.randomUUID();
 
@@ -103,7 +103,7 @@ serve(async (req) => {
       .single();
 
     if (orderError) {
-      console.error("Database error:", orderError);
+      console.error("Order creation failed");
       throw new Error("Failed to create order");
     }
 
@@ -118,16 +118,23 @@ serve(async (req) => {
 
     await supabase.from("order_items").insert(orderItemsData);
 
-    // Decrease stock
+    // Decrease stock with optimistic locking
     for (const item of validatedItems) {
       const dbProduct = productMap.get(item.productId);
-      await supabase
+      const { data: updatedProduct, error: stockError } = await supabase
         .from("products")
         .update({ stock: dbProduct.stock - item.quantity })
-        .eq("id", item.productId);
+        .eq("id", item.productId)
+        .gte("stock", item.quantity)
+        .select();
+
+      if (stockError || !updatedProduct || updatedProduct.length === 0) {
+        console.error("Stock update failed for product");
+        throw new Error(`Stock changed for ${item.name}, please retry`);
+      }
     }
 
-    console.log(`Order created: ${order.id}`);
+    console.log("Order created successfully");
 
     return new Response(
       JSON.stringify({
@@ -143,7 +150,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {
-    console.error("Error creating order:", error);
+    console.error("Order creation error");
     return new Response(
       JSON.stringify({
         success: false,

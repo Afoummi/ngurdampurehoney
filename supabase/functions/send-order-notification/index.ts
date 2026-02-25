@@ -143,7 +143,7 @@ const handler = async (req: Request): Promise<Response> => {
       `
     );
 
-    console.log("Admin email sent:", adminEmailResponse);
+    console.log("Admin email sent successfully");
 
     // Send confirmation to customer
     const customerEmailResponse = await sendEmail(
@@ -197,7 +197,7 @@ const handler = async (req: Request): Promise<Response> => {
       `
     );
 
-    console.log("Customer email sent:", customerEmailResponse);
+    console.log("Customer email sent successfully");
 
     return new Response(
       JSON.stringify({ 
@@ -211,7 +211,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error: any) {
-    console.error("Error in send-order-notification:", error);
+    console.error("Notification sending failed");
     return new Response(
       JSON.stringify({ error: error.message }),
       {
