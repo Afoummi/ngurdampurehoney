@@ -29,17 +29,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isModerator = userRole === 'moderator';
 
   useEffect(() => {
+    // Set up auth listener FIRST, then check current session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+        // Only update state on meaningful events to avoid refresh loops
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
+          setSession(session);
+          setUser(session?.user ?? null);
 
-        if (session?.user) {
-          setTimeout(() => {
-            checkUserRole(session.user.id);
-          }, 0);
-        } else {
-          setUserRole('customer');
+          if (session?.user) {
+            // Use setTimeout to avoid potential deadlock with Supabase client
+            setTimeout(() => {
+              checkUserRole(session.user.id);
+            }, 0);
+          } else {
+            setUserRole('customer');
+          }
+        }
+        
+        // Handle TOKEN_REFRESHED silently without re-fetching roles
+        if (event === 'TOKEN_REFRESHED' && session) {
+          setSession(session);
         }
       }
     );
