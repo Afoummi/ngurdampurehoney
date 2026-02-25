@@ -100,17 +100,30 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
     }
   };
 
+  const escapeHtml = (str: string): string => {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+
   const printReceipt = (order: Order) => {
     const receiptWindow = window.open('', '_blank', 'width=400,height=600');
     if (!receiptWindow) return;
 
-    const itemsHtml = order.items.map((item: any) => `
+    const itemsHtml = order.items.map((item: any) => {
+      const name = escapeHtml(item.title || item.name || item.productTitle || '');
+      const variant = item.variantTitle ? ` (${escapeHtml(item.variantTitle)})` : '';
+      return `
       <tr>
-        <td style="padding:6px 0;border-bottom:1px solid #eee;">${item.title || item.name || item.productTitle}${item.variantTitle ? ` (${item.variantTitle})` : ''}</td>
-        <td style="padding:6px 0;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
-        <td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right;">₦${(Number(item.price) * item.quantity).toLocaleString()}</td>
+        <td style="padding:6px 0;border-bottom:1px solid #eee;">${name}${variant}</td>
+        <td style="padding:6px 0;border-bottom:1px solid #eee;text-align:center;">${Number(item.quantity)}</td>
+        <td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right;">₦${(Number(item.price) * Number(item.quantity)).toLocaleString()}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
 
     receiptWindow.document.write(`
       <!DOCTYPE html>
@@ -122,15 +135,15 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
           <p style="margin:4px 0;color:#666;font-size:13px;">Order Receipt</p>
         </div>
         <hr style="border:none;border-top:2px dashed #ccc;margin:16px 0;">
-        <p style="font-size:13px;"><strong>Order ID:</strong> ${order.id.slice(0,8).toUpperCase()}</p>
+        <p style="font-size:13px;"><strong>Order ID:</strong> ${escapeHtml(order.id.slice(0,8).toUpperCase())}</p>
         <p style="font-size:13px;"><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString('en-NG', { year:'numeric', month:'long', day:'numeric' })}</p>
-        <p style="font-size:13px;"><strong>Status:</strong> ${order.status} | <strong>Payment:</strong> ${order.payment_status}</p>
+        <p style="font-size:13px;"><strong>Status:</strong> ${escapeHtml(order.status)} | <strong>Payment:</strong> ${escapeHtml(order.payment_status)}</p>
         <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
-        <p style="font-size:13px;"><strong>Customer:</strong> ${order.customer_name}</p>
-        <p style="font-size:13px;"><strong>Email:</strong> ${order.customer_email}</p>
-        ${order.customer_phone ? `<p style="font-size:13px;"><strong>Phone:</strong> ${order.customer_phone}</p>` : ''}
-        <p style="font-size:13px;"><strong>Address:</strong> ${order.shipping_address}</p>
-        ${order.notes ? `<p style="font-size:13px;"><strong>Notes:</strong> ${order.notes}</p>` : ''}
+        <p style="font-size:13px;"><strong>Customer:</strong> ${escapeHtml(order.customer_name)}</p>
+        <p style="font-size:13px;"><strong>Email:</strong> ${escapeHtml(order.customer_email)}</p>
+        ${order.customer_phone ? `<p style="font-size:13px;"><strong>Phone:</strong> ${escapeHtml(order.customer_phone)}</p>` : ''}
+        <p style="font-size:13px;"><strong>Address:</strong> ${escapeHtml(order.shipping_address)}</p>
+        ${order.notes ? `<p style="font-size:13px;"><strong>Notes:</strong> ${escapeHtml(order.notes)}</p>` : ''}
         <hr style="border:none;border-top:2px dashed #ccc;margin:16px 0;">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead>
