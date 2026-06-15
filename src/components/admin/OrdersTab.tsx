@@ -33,6 +33,7 @@ const statusColors: Record<string, string> = {
   pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
   confirmed: "bg-blue-500/10 text-blue-600 border-blue-500/20",
   processing: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+  in_transit: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
   shipped: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
   delivered: "bg-green-500/10 text-green-600 border-green-500/20",
   cancelled: "bg-red-500/10 text-red-600 border-red-500/20"
@@ -45,14 +46,20 @@ const paymentStatusColors: Record<string, string> = {
   refunded: "bg-gray-500/10 text-gray-600 border-gray-500/20"
 };
 
+const STATUS_FLOW = ["pending", "processing", "in_transit", "delivered"] as const;
+
 export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [lowStockCount, setLowStockCount] = useState(0);
 
   useEffect(() => {
     fetchOrders();
+    supabase.from('products').select('id, stock').lt('stock', 5).then(({ data }) => {
+      setLowStockCount(data?.length || 0);
+    });
   }, []);
 
   const fetchOrders = async () => {
@@ -208,7 +215,26 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
     );
   }
 
+  const totalSales = orders.filter(o => o.payment_status === 'paid').reduce((s, o) => s + Number(o.total_amount), 0);
+  const pendingCount = orders.filter(o => o.status === 'pending').length;
+
   return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2"><CardDescription>Total Sales (Paid)</CardDescription></CardHeader>
+          <CardContent><div className="font-display text-2xl font-bold text-primary">₦{totalSales.toLocaleString()}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardDescription>Pending Orders</CardDescription></CardHeader>
+          <CardContent><div className="font-display text-2xl font-bold">{pendingCount}</div></CardContent>
+        </Card>
+        <Card className={lowStockCount > 0 ? "border-destructive/50" : ""}>
+          <CardHeader className="pb-2"><CardDescription>Low-Stock Alerts</CardDescription></CardHeader>
+          <CardContent><div className={`font-display text-2xl font-bold ${lowStockCount > 0 ? "text-destructive" : ""}`}>{lowStockCount}</div></CardContent>
+        </Card>
+      </div>
+
     <Card>
       <CardHeader>
         <CardTitle>Orders</CardTitle>
