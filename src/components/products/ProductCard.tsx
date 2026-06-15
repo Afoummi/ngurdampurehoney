@@ -57,6 +57,9 @@ export function ProductCard({ product }: ProductCardProps) {
             <h3 className="font-display font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
               {product.name}
             </h3>
+            {product.size && (
+              <p className="text-xs font-medium text-primary/80 mt-0.5">{product.size}</p>
+            )}
             <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
               {product.description || "Pure natural honey from Ngurdam."}
             </p>
