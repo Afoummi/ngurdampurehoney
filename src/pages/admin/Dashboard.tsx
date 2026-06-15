@@ -13,6 +13,9 @@ import { SettingsTab } from "@/components/admin/SettingsTab";
 import { ProductsTab } from "@/components/admin/ProductsTab";
 import { PromoTab } from "@/components/admin/PromoTab";
 import { SubscribersTab } from "@/components/admin/SubscribersTab";
+import { UsersTab } from "@/components/admin/UsersTab";
+import { InventoryTab } from "@/components/admin/InventoryTab";
+import { Boxes, UserCog } from "lucide-react";
 
 interface DashboardStats {
   totalOrders: number;
@@ -169,15 +172,19 @@ export default function AdminDashboard() {
         <Tabs defaultValue="orders" className="space-y-4">
           <TabsList>
             <TabsTrigger value="orders" className="gap-2"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
+            <TabsTrigger value="inventory" className="gap-2"><Boxes className="h-4 w-4" /> Inventory</TabsTrigger>
             <TabsTrigger value="products" className="gap-2"><Package className="h-4 w-4" /> Products</TabsTrigger>
-            <TabsTrigger value="customers" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>
+            <TabsTrigger value="users" className="gap-2"><UserCog className="h-4 w-4" /> Users</TabsTrigger>
+            <TabsTrigger value="customers" className="gap-2"><Users className="h-4 w-4" /> Customers</TabsTrigger>
             <TabsTrigger value="promo" className="gap-2"><Megaphone className="h-4 w-4" /> Promo</TabsTrigger>
             <TabsTrigger value="subscribers" className="gap-2"><Mail className="h-4 w-4" /> Subscribers</TabsTrigger>
             <TabsTrigger value="settings" className="gap-2"><Settings className="h-4 w-4" /> Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders"><OrdersTab onOrderUpdate={fetchStats} /></TabsContent>
+          <TabsContent value="inventory"><InventoryTab /></TabsContent>
           <TabsContent value="products"><ProductsTab canDelete={true} canCreate={true} /></TabsContent>
+          <TabsContent value="users"><UsersTab /></TabsContent>
           <TabsContent value="customers"><CustomersTab canManageRoles={true} /></TabsContent>
           <TabsContent value="promo"><PromoTab /></TabsContent>
           <TabsContent value="subscribers"><SubscribersTab /></TabsContent>
