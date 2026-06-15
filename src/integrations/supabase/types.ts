@@ -147,6 +147,7 @@ export type Database = {
           is_active: boolean
           name: string
           price: number
+          size: string | null
           stock: number
           updated_at: string
         }
@@ -159,6 +160,7 @@ export type Database = {
           is_active?: boolean
           name: string
           price?: number
+          size?: string | null
           stock?: number
           updated_at?: string
         }
@@ -171,6 +173,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           price?: number
+          size?: string | null
           stock?: number
           updated_at?: string
         }

@@ -72,8 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error checking user role:', error);
@@ -81,7 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      setUserRole((data?.role as UserRole) || 'customer');
+      const roles = (data ?? []).map((r) => r.role as UserRole);
+      // Pick highest-privilege role: admin > moderator > customer
+      if (roles.includes('admin')) setUserRole('admin');
+      else if (roles.includes('moderator')) setUserRole('moderator');
+      else setUserRole('customer');
     } catch (error) {
       console.error('Error checking user role:', error);
       setUserRole('customer');

@@ -8,6 +8,3 @@ verify_jwt = false
 
 [functions.get-order]
 verify_jwt = false
-
-[functions.shopify-storefront]
-verify_jwt = false

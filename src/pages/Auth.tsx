@@ -55,7 +55,7 @@ export default function Auth() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       emailSchema.parse(loginEmail);
       passwordSchema.parse(loginPassword);
@@ -65,16 +65,32 @@ export default function Auth() {
         return;
       }
     }
-    
+
     setIsLoading(true);
+
+    // Clear any stale Supabase auth tokens before attempting a fresh login
+    try {
+      await supabase.auth.signOut();
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token"))
+        .forEach((k) => localStorage.removeItem(k));
+    } catch {
+      // ignore – we just want a clean slate
+    }
+
     const { error } = await signIn(loginEmail, loginPassword);
     setIsLoading(false);
-    
+
     if (error) {
-      if (error.message.includes("Invalid login credentials")) {
-        toast.error("Invalid email or password");
+      const msg = error.message || "";
+      if (msg.includes("Invalid login credentials")) {
+        toast.error("Invalid email or password. Please try again.");
+      } else if (msg.toLowerCase().includes("rate") || msg.includes("429") || msg.toLowerCase().includes("too many")) {
+        toast.error("Too many login attempts. Please wait a minute and try again.");
+      } else if (msg.toLowerCase().includes("email not confirmed")) {
+        toast.error("Please confirm your email address before signing in.");
       } else {
-        toast.error(error.message);
+        toast.error(msg || "Sign in failed. Please try again.");
       }
     } else {
       toast.success("Welcome back!");
