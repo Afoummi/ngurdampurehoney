@@ -393,5 +393,6 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
         </Table>
       </CardContent>
     </Card>
+    </div>
   );
 }
