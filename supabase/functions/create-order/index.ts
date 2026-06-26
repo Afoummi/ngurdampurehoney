@@ -22,12 +22,51 @@ interface CustomerInfo {
   userId?: string;
 }
 
+// Simple in-memory sliding-window rate limit (per edge isolate).
+// 5 order attempts per IP per 10 minutes.
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const rateLimitStore = new Map<string, number[]>();
+
+function checkRateLimit(key: string): boolean {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  const hits = (rateLimitStore.get(key) ?? []).filter((t) => t > windowStart);
+  if (hits.length >= RATE_LIMIT_MAX) {
+    rateLimitStore.set(key, hits);
+    return false;
+  }
+  hits.push(now);
+  rateLimitStore.set(key, hits);
+  // opportunistic cleanup
+  if (rateLimitStore.size > 5000) {
+    for (const [k, v] of rateLimitStore) {
+      const fresh = v.filter((t) => t > windowStart);
+      if (fresh.length === 0) rateLimitStore.delete(k);
+      else rateLimitStore.set(k, fresh);
+    }
+  }
+  return true;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Rate limit by client IP (best-effort; isolates may differ)
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
+    if (!checkRateLimit(`ip:${ip}`)) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Too many order attempts. Please try again shortly." }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 429 }
+      );
+    }
+
     const { items, customerInfo }: { items: OrderItem[]; customerInfo: CustomerInfo } = await req.json();
 
     if (!items || !Array.isArray(items) || items.length === 0) {
