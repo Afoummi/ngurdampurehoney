@@ -55,6 +55,18 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limit by client IP (best-effort; isolates may differ)
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
+    if (!checkRateLimit(`ip:${ip}`)) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Too many order attempts. Please try again shortly." }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 429 }
+      );
+    }
+
     const { items, customerInfo }: { items: OrderItem[]; customerInfo: CustomerInfo } = await req.json();
 
     if (!items || !Array.isArray(items) || items.length === 0) {
