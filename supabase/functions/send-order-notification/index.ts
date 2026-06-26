@@ -104,7 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send notification to admin
     const adminEmailResponse = await sendEmail(
       adminEmail,
-      `🍯 New Order - ${orderDetails.customerName}`,
+      `🍯 New Order - ${esc(orderDetails.customerName)}`,
       `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #D97706, #F59E0B); padding: 20px; text-align: center;">
@@ -112,13 +112,13 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="padding: 20px; background: #fff;">
-            <h2 style="color: #333;">Order #${orderDetails.id.slice(0, 8)}</h2>
+            <h2 style="color: #333;">Order #${esc(orderDetails.id.slice(0, 8))}</h2>
             
             <h3 style="color: #666; border-bottom: 2px solid #D97706; padding-bottom: 10px;">Customer Details</h3>
-            <p><strong>Name:</strong> ${orderDetails.customerName}</p>
-            <p><strong>Email:</strong> ${orderDetails.customerEmail}</p>
-            ${orderDetails.customerPhone ? `<p><strong>Phone:</strong> ${orderDetails.customerPhone}</p>` : ''}
-            <p><strong>Shipping Address:</strong> ${orderDetails.shippingAddress}</p>
+            <p><strong>Name:</strong> ${esc(orderDetails.customerName)}</p>
+            <p><strong>Email:</strong> ${esc(orderDetails.customerEmail)}</p>
+            ${orderDetails.customerPhone ? `<p><strong>Phone:</strong> ${esc(orderDetails.customerPhone)}</p>` : ''}
+            <p><strong>Shipping Address:</strong> ${esc(orderDetails.shippingAddress)}</p>
             
             <h3 style="color: #666; border-bottom: 2px solid #D97706; padding-bottom: 10px; margin-top: 20px;">Order Items</h3>
             <table style="width: 100%; border-collapse: collapse;">
@@ -135,7 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
               <tfoot>
                 <tr>
                   <td colspan="2" style="padding: 15px; font-weight: bold; text-align: right;">Total:</td>
-                  <td style="padding: 15px; font-weight: bold; text-align: right; color: #D97706;">₦${orderDetails.totalAmount.toLocaleString()}</td>
+                  <td style="padding: 15px; font-weight: bold; text-align: right; color: #D97706;">₦${Number(orderDetails.totalAmount).toLocaleString()}</td>
                 </tr>
               </tfoot>
             </table>
@@ -159,6 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
       orderDetails.customerEmail,
       `Order Confirmed - AB Sardauna 🍯`,
       `
+
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #D97706, #F59E0B); padding: 20px; text-align: center;">
             <h1 style="color: white; margin: 0;">Thank You for Your Order! 🍯</h1>
