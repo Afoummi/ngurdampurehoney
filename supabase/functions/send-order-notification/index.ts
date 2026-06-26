@@ -84,13 +84,22 @@ const handler = async (req: Request): Promise<Response> => {
     const { orderDetails, adminEmail }: OrderNotificationRequest = await req.json();
     console.log("Processing order notification for order:", orderDetails.id);
 
+    const esc = (v: unknown): string =>
+      String(v ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
     const itemsHtml = orderDetails.items
       .map(item => `<tr>
-        <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.title}</td>
-        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₦${(item.price * item.quantity).toLocaleString()}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #eee;">${esc(item.title)}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${esc(item.quantity)}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₦${(Number(item.price) * Number(item.quantity)).toLocaleString()}</td>
       </tr>`)
       .join("");
+
 
     // Send notification to admin
     const adminEmailResponse = await sendEmail(
