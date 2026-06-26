@@ -166,11 +166,11 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="padding: 20px; background: #fff;">
-            <p>Dear ${orderDetails.customerName},</p>
+            <p>Dear ${esc(orderDetails.customerName)},</p>
             <p>We've received your order and are getting it ready for you!</p>
             
             <h3 style="color: #666; border-bottom: 2px solid #D97706; padding-bottom: 10px;">Order Summary</h3>
-            <p><strong>Order ID:</strong> #${orderDetails.id.slice(0, 8)}</p>
+            <p><strong>Order ID:</strong> #${esc(orderDetails.id.slice(0, 8))}</p>
             
             <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
               <thead>
@@ -186,13 +186,14 @@ const handler = async (req: Request): Promise<Response> => {
               <tfoot>
                 <tr>
                   <td colspan="2" style="padding: 15px; font-weight: bold; text-align: right;">Total:</td>
-                  <td style="padding: 15px; font-weight: bold; text-align: right; color: #D97706;">₦${orderDetails.totalAmount.toLocaleString()}</td>
+                  <td style="padding: 15px; font-weight: bold; text-align: right; color: #D97706;">₦${Number(orderDetails.totalAmount).toLocaleString()}</td>
                 </tr>
               </tfoot>
             </table>
             
             <h3 style="color: #666; border-bottom: 2px solid #D97706; padding-bottom: 10px;">Shipping Address</h3>
-            <p>${orderDetails.shippingAddress}</p>
+            <p>${esc(orderDetails.shippingAddress)}</p>
+
             
             <p style="margin-top: 20px; padding: 15px; background: #D1FAE5; border-radius: 8px;">
               We'll notify you when your order has been shipped. Thank you for choosing Ngurdam Pure Honey!
