@@ -4,25 +4,32 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Product, fetchProductById, formatPrice } from "@/lib/products";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Product, fetchProductById, fetchProducts, formatPrice } from "@/lib/products";
+import { ProductGrid } from "@/components/products/ProductGrid";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart, Minus, Plus, ArrowLeft } from "lucide-react";
+import { ShoppingCart, Minus, Plus, ArrowLeft, ShieldCheck, Truck, Leaf } from "lucide-react";
+import singleJar from "@/assets/photos/single-jar.jpg";
 
 export default function ProductDetail() {
   const { handle } = useParams<{ handle: string }>();
   const [product, setProduct] = useState<Product | null>(null);
+  const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const addItem = useCartStore((state) => state.addItem);
+  const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
     async function load() {
       if (!handle) return;
+      setLoading(true);
       try {
         const data = await fetchProductById(handle);
         setProduct(data);
+        const all = await fetchProducts(8);
+        setRelated(all.filter((p) => p.id !== handle).slice(0, 4));
       } catch (err) {
         console.error(err);
       } finally {
@@ -34,7 +41,6 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!product || product.stock <= 0) return;
-
     addItem({
       productId: product.id,
       productName: product.name,
@@ -42,9 +48,8 @@ export default function ProductDetail() {
       quantity,
       imageUrl: product.image_url,
     });
-
     toast.success("Added to cart", {
-      description: `${quantity}x ${product.name} has been added to your cart.`,
+      description: `${quantity}× ${product.name}`,
       position: "top-center",
     });
   };
@@ -55,10 +60,10 @@ export default function ProductDetail() {
         <Navbar />
         <main className="flex-1 container py-12">
           <div className="grid md:grid-cols-2 gap-12">
-            <Skeleton className="aspect-square rounded-2xl" />
+            <Skeleton className="aspect-square rounded-3xl" />
             <div className="space-y-4">
-              <Skeleton className="h-10 w-3/4" />
-              <Skeleton className="h-6 w-1/4" />
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-6 w-1/3" />
               <Skeleton className="h-24 w-full" />
               <Skeleton className="h-12 w-full" />
             </div>
@@ -73,11 +78,9 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1 container py-12 text-center">
-          <h1 className="font-display text-2xl font-bold mb-4">Product not found</h1>
-          <Button asChild>
-            <Link to="/products">Back to Products</Link>
-          </Button>
+        <main className="flex-1 container py-20 text-center">
+          <h1 className="font-display text-3xl mb-4">Product not found</h1>
+          <Button asChild variant="honey"><Link to="/products">Browse Products</Link></Button>
         </main>
         <Footer />
       </div>
@@ -88,79 +91,121 @@ export default function ProductDetail() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1">
-        <div className="container py-8 md:py-12">
-          <Button variant="ghost" asChild className="mb-6">
-            <Link to="/products">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back to Products
-            </Link>
+        <div className="container py-10 md:py-14">
+          <Button variant="ghost" asChild className="mb-6 -ml-3">
+            <Link to="/products"><ArrowLeft className="w-4 h-4" /> Back to Products</Link>
           </Button>
 
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-            {/* Image */}
-            <div className="aspect-square rounded-2xl overflow-hidden bg-secondary/20">
-              {product.image_url ? (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-[180px]">🍯</div>
-              )}
+          <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
+            <div className="space-y-4">
+              <div className="aspect-square rounded-3xl overflow-hidden bg-honey-cream shadow-lift">
+                <img src={product.image_url || singleJar} alt={product.name}
+                  className="w-full h-full object-cover" />
+              </div>
             </div>
 
-            {/* Details */}
             <div className="space-y-6">
-              <div>
-                <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">{product.name}</h1>
-                <p className="text-2xl font-bold text-primary">{formatPrice(product.price)}</p>
+              <div className="space-y-3">
+                {product.size && (
+                  <p className="text-xs uppercase tracking-[0.2em] text-honey-deep font-medium">
+                    {product.size}
+                  </p>
+                )}
+                <h1 className="font-display text-4xl md:text-5xl leading-tight">{product.name}</h1>
+                <p className="font-display text-4xl text-honey-deep">{formatPrice(product.price)}</p>
               </div>
 
-              {product.category && (
-                <Badge variant="secondary">{product.category}</Badge>
-              )}
+              {product.category && <Badge variant="secondary">{product.category}</Badge>}
 
-              <p className="text-muted-foreground leading-relaxed">
-                {product.description || "Pure, natural honey from Ngurdam. Experience the golden sweetness of nature."}
+              <p className="text-muted-foreground leading-relaxed text-lg">
+                {product.description || "Raw, unfiltered honey from Ngurdam apiaries — golden, fragrant, and full of natural goodness."}
               </p>
 
-              <div className="text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm">
                 {product.stock > 0 ? (
-                  <span className="text-green-600">In stock ({product.stock} available)</span>
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-success" />
+                    <span className="text-success font-medium">In stock</span>
+                    <span className="text-muted-foreground">· {product.stock} available</span>
+                  </>
                 ) : (
-                  <span className="text-destructive">Out of stock</span>
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-destructive" />
+                    <span className="text-destructive font-medium">Out of stock</span>
+                  </>
                 )}
               </div>
 
-              {/* Quantity */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium">Quantity</label>
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" size="icon" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+              <div className="space-y-2">
+                <label className="text-sm font-medium" htmlFor="qty">Quantity</label>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="icon" onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity">
                     <Minus className="w-4 h-4" />
                   </Button>
-                  <span className="w-12 text-center font-medium">{quantity}</span>
-                  <Button variant="outline" size="icon" onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}>
+                  <span id="qty" className="w-14 text-center font-display text-xl">{quantity}</span>
+                  <Button variant="outline" size="icon" onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} aria-label="Increase quantity">
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
 
-              {/* Add to Cart */}
-              <Button
-                size="lg"
-                className="w-full bg-primary hover:bg-primary/90"
-                onClick={handleAddToCart}
-                disabled={product.stock <= 0}
-              >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
+              <Button variant="honey" size="xl" className="w-full" onClick={handleAddToCart} disabled={product.stock <= 0}>
+                <ShoppingCart className="w-5 h-5" />
+                {product.stock <= 0 ? "Out of Stock" : `Add to Cart — ${formatPrice(product.price * quantity)}`}
               </Button>
+
+              <div className="grid grid-cols-3 gap-2 pt-4 border-t border-border/60">
+                <Trust icon={Leaf} label="100% Raw" />
+                <Trust icon={ShieldCheck} label="Lab Tested" />
+                <Trust icon={Truck} label="Nationwide" />
+              </div>
+
+              <Accordion type="single" collapsible className="border-t border-border/60 pt-4">
+                <AccordionItem value="desc">
+                  <AccordionTrigger>About this honey</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    {product.description || "Raw, unfiltered honey harvested by hand in Sokoto State."} It crystallizes naturally over time — gently warm to restore its smooth flow.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="ship">
+                  <AccordionTrigger>Shipping &amp; Delivery</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    We deliver nationwide. Once you complete checkout we'll confirm pricing and delivery time with you on WhatsApp.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="store">
+                  <AccordionTrigger>Storage</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    Store in a cool, dry place away from direct sunlight. Properly stored, raw honey lasts indefinitely.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
+
+          {related.length > 0 && (
+            <section className="mt-24" aria-labelledby="related-heading">
+              <div className="flex items-end justify-between mb-8">
+                <h2 id="related-heading" className="font-display text-3xl md:text-4xl">
+                  You may also <span className="italic text-honey-deep">love</span>
+                </h2>
+                <Button asChild variant="ghost"><Link to="/products">View all →</Link></Button>
+              </div>
+              <ProductGrid limit={4} />
+            </section>
+          )}
         </div>
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function Trust({ icon: Icon, label }: { icon: React.ComponentType<{ className?: string }>; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1.5 text-center p-3 rounded-lg bg-honey-cream/50">
+      <Icon className="w-5 h-5 text-honey-deep" />
+      <span className="text-xs font-medium text-foreground">{label}</span>
     </div>
   );
 }

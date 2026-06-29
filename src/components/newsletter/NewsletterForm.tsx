@@ -49,18 +49,15 @@ export function NewsletterForm() {
     <form onSubmit={handleSubmit} className="flex gap-2">
       <Input
         type="email"
-        placeholder="Enter your email"
+        placeholder="you@example.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="bg-background/50"
+        className="bg-background/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 focus-visible:ring-honey"
         disabled={isLoading}
+        aria-label="Email address"
       />
-      <Button type="submit" size="icon" disabled={isLoading}>
-        {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Send className="h-4 w-4" />
-        )}
+      <Button type="submit" variant="honey" size="icon" disabled={isLoading} aria-label="Subscribe to newsletter">
+        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
       </Button>
     </form>
   );

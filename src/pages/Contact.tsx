@@ -1,166 +1,108 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Mail, Phone, MapPin, MessageCircle, Send, Clock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { BRAND } from "@/lib/brand";
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent!", {
-      description: "We'll get back to you as soon as possible.",
-    });
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    const subject = encodeURIComponent(formData.subject || "Enquiry from Ngurdam Honey website");
+    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`);
+    window.location.href = `mailto:${BRAND.email}?subject=${subject}&body=${body}`;
+    toast.success("Opening your email app...");
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1">
-        {/* Header */}
-        <section className="bg-card py-12 md:py-20">
-          <div className="container text-center">
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-              Get in <span className="text-gradient">Touch</span>
+        <section className="bg-honey-cream/40 py-16 md:py-24">
+          <div className="container text-center max-w-3xl">
+            <p className="text-xs uppercase tracking-[0.2em] text-honey-deep font-medium mb-3">Contact</p>
+            <h1 className="font-display text-5xl md:text-6xl leading-tight mb-4">
+              We'd love to <span className="italic text-honey-deep">hear from you</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              Have questions about our honey products? Want to place a bulk order? 
-              We'd love to hear from you.
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              Have questions about our honey, bulk orders, or partnerships? Reach out below or
+              chat with us directly on WhatsApp.
             </p>
           </div>
         </section>
 
-        {/* Contact Content */}
-        <section className="py-12 md:py-16">
+        <section className="py-16 md:py-24">
           <div className="container">
-            <div className="grid lg:grid-cols-2 gap-12">
-              {/* Contact Form */}
-              <Card className="border-border/50">
-                <CardContent className="p-6 md:p-8">
-                  <h2 className="font-display text-2xl font-bold mb-6">Send us a Message</h2>
-                  <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid lg:grid-cols-5 gap-10">
+              <Card className="lg:col-span-3 border-border/60 shadow-card">
+                <CardContent className="p-6 md:p-10">
+                  <h2 className="font-display text-3xl mb-6">Send us a message</h2>
+                  <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                          id="name"
-                          placeholder="Your name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          required
-                        />
+                        <Label htmlFor="name">Your Name</Label>
+                        <Input id="name" required value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="your@email.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          required
-                        />
+                        <Input id="email" type="email" required value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="subject">Subject</Label>
-                      <Input
-                        id="subject"
-                        placeholder="What's this about?"
-                        value={formData.subject}
-                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        required
-                      />
+                      <Input id="subject" required value={formData.subject}
+                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="message">Message</Label>
-                      <Textarea
-                        id="message"
-                        placeholder="Tell us more..."
-                        rows={5}
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        required
-                      />
+                      <Textarea id="message" required rows={5} value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
                     </div>
-                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                      <Send className="w-4 h-4 mr-2" /> Send Message
+                    <Button type="submit" variant="honey" size="lg" className="w-full">
+                      <Send className="w-4 h-4" /> Send Message
                     </Button>
                   </form>
                 </CardContent>
               </Card>
 
-              {/* Contact Info */}
-              <div className="space-y-6">
-                <h2 className="font-display text-2xl font-bold">Contact Information</h2>
-                <p className="text-muted-foreground">
-                  Reach out to us through any of these channels. We're here to help!
+              <div className="lg:col-span-2 space-y-4">
+                <h2 className="font-display text-3xl">Reach us directly</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  We typically reply within a few hours on weekdays.
                 </p>
 
-                <div className="space-y-4">
-                  {[
-                    {
-                      icon: Mail,
-                      title: "Email",
-                      info: "sardaunannigeria@gmail.com",
-                      description: "We reply within 24 hours",
-                    },
-                    {
-                      icon: Phone,
-                      title: "Phone",
-                      info: "08027798163 / 08035890705",
-                      description: "Mon-Fri, 9am-5pm WAT",
-                    },
-                    {
-                      icon: MapPin,
-                      title: "Address",
-                      info: "Sokoto, Nigeria",
-                      description: "Visit by appointment",
-                    },
-                    {
-                      icon: Clock,
-                      title: "Business Hours",
-                      info: "Monday - Friday",
-                      description: "9:00 AM - 5:00 PM WAT",
-                    },
-                  ].map((item, index) => (
-                    <Card key={index} className="border-border/50">
-                      <CardContent className="p-4 flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                          <item.icon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold">{item.title}</h3>
-                          <p className="text-foreground">{item.info}</p>
-                          <p className="text-sm text-muted-foreground">{item.description}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                <ContactCard icon={MessageCircle} label="WhatsApp" highlight>
+                  <a href={`https://wa.me/${BRAND.whatsappNumber}`} target="_blank" rel="noopener noreferrer"
+                    className="text-honey-deep font-medium hover:underline">
+                    Chat with us →
+                  </a>
+                </ContactCard>
 
-                {/* FAQ Prompt */}
-                <Card className="border-primary/30 bg-primary/5">
-                  <CardContent className="p-6">
-                    <h3 className="font-display font-semibold text-lg mb-2">Looking for quick answers?</h3>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      Check our FAQ section for common questions about shipping, returns, and our products.
-                    </p>
-                    <Button variant="outline">View FAQs</Button>
-                  </CardContent>
-                </Card>
+                <ContactCard icon={Phone} label="Phone">
+                  <a href={`tel:${BRAND.phones[0]}`} className="block hover:text-honey-deep">{BRAND.phones[0]}</a>
+                  <a href={`tel:${BRAND.phones[1]}`} className="block hover:text-honey-deep">{BRAND.phones[1]}</a>
+                </ContactCard>
+
+                <ContactCard icon={Mail} label="Email">
+                  <a href={`mailto:${BRAND.email}`} className="hover:text-honey-deep break-all">{BRAND.email}</a>
+                </ContactCard>
+
+                <ContactCard icon={MapPin} label="Office">
+                  {BRAND.address.line1},<br />{BRAND.address.line2},<br />{BRAND.address.line3}.
+                </ContactCard>
+
+                <ContactCard icon={Clock} label="Hours">
+                  Mon – Sat<br />9:00 AM – 6:00 PM WAT
+                </ContactCard>
               </div>
             </div>
           </div>
@@ -168,5 +110,21 @@ export default function Contact() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+function ContactCard({ icon: Icon, label, children, highlight }: { icon: React.ComponentType<{ className?: string }>; label: string; children: React.ReactNode; highlight?: boolean }) {
+  return (
+    <Card className={`border-border/60 ${highlight ? "ring-1 ring-honey/40 bg-honey-cream/40" : ""}`}>
+      <CardContent className="p-5 flex items-start gap-4">
+        <div className="w-10 h-10 rounded-xl bg-honey-cream flex items-center justify-center flex-shrink-0">
+          <Icon className="w-5 h-5 text-honey-deep" />
+        </div>
+        <div className="text-sm leading-relaxed">
+          <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground mb-1">{label}</p>
+          <div className="text-foreground">{children}</div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

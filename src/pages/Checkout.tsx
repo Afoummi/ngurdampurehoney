@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -14,39 +14,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/products";
 import { toast } from "sonner";
-import { Loader2, ShoppingBag, ArrowLeft, ShieldCheck, CreditCard } from "lucide-react";
+import { Loader2, ShoppingBag, ArrowLeft, ShieldCheck, MessageCircle, MapPin } from "lucide-react";
 import { z } from "zod";
+import { BRAND } from "@/lib/brand";
+import singleJar from "@/assets/photos/single-jar.jpg";
 
 const checkoutSchema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().trim().email("Please enter a valid email address").max(255),
+  name: z.string().trim().min(2, "Please enter your full name").max(100),
   phone: z.string().trim().min(10, "Please enter a valid phone number").max(20),
-  address: z.string().trim().min(10, "Please enter your full delivery address").max(500),
+  address: z.string().trim().min(5, "Please enter your delivery address").max(500),
+  state: z.string().trim().min(2, "State is required").max(50),
+  city: z.string().trim().min(2, "City is required").max(50),
+  email: z.string().trim().email().max(255).optional().or(z.literal("")),
   notes: z.string().max(1000).optional(),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
-
-// Paystack public test key — safe to expose in frontend
-const PAYSTACK_PUBLIC_KEY = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-
-declare global {
-  interface Window {
-    PaystackPop?: any;
-  }
-}
-
-function loadPaystack(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (window.PaystackPop) return resolve();
-    const s = document.createElement("script");
-    s.src = "https://js.paystack.co/v1/inline.js";
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("Failed to load Paystack"));
-    document.body.appendChild(s);
-  });
-}
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -56,10 +39,13 @@ export default function Checkout() {
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
 
   const [formData, setFormData] = useState<CheckoutFormData>({
-    name: "", email: "", phone: "", address: "", notes: "",
+    name: "", phone: "", address: "", state: "", city: "", email: "", notes: "",
   });
 
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items]
+  );
 
   useEffect(() => {
     if (items.length === 0) navigate("/products");
@@ -99,7 +85,38 @@ export default function Checkout() {
     return true;
   };
 
-  const createOrder = async (reference: string) => {
+  const buildWhatsAppMessage = (orderId?: string) => {
+    const itemsText = items
+      .map((i, idx) => `${idx + 1}. ${i.productName}  x${i.quantity}  —  ${formatPrice(i.price * i.quantity)}`)
+      .join("\n");
+
+    const fullAddress = `${formData.address.trim()}, ${formData.city.trim()}, ${formData.state.trim()}`;
+
+    return [
+      `*New Order — Ngurdam Honey*`,
+      orderId ? `Reference: ${orderId.slice(0, 8).toUpperCase()}` : "",
+      ``,
+      `*Customer*`,
+      `Name: ${formData.name.trim()}`,
+      `Phone: ${formData.phone.trim()}`,
+      formData.email ? `Email: ${formData.email.trim()}` : "",
+      `Address: ${fullAddress}`,
+      ``,
+      `*Items*`,
+      itemsText,
+      ``,
+      `*Total: ${formatPrice(totalPrice)}*`,
+      ``,
+      formData.notes ? `Notes: ${formData.notes.trim()}` : "",
+      ``,
+      `Please confirm delivery details and payment. Thank you!`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+  };
+
+  const createOrder = async () => {
+    const fullAddress = `${formData.address.trim()}, ${formData.city.trim()}, ${formData.state.trim()}`;
     const orderItems = items.map((item) => ({
       productId: item.productId,
       productName: item.productName,
@@ -112,9 +129,9 @@ export default function Checkout() {
         items: orderItems,
         customerInfo: {
           customerName: formData.name.trim(),
-          customerEmail: formData.email.trim().toLowerCase(),
+          customerEmail: (formData.email?.trim() || `${formData.phone.trim()}@ngurdam.local`).toLowerCase(),
           customerPhone: formData.phone.trim(),
-          shippingAddress: formData.address.trim(),
+          shippingAddress: fullAddress,
           notes: formData.notes?.trim() || null,
           userId: user?.id || null,
         },
@@ -123,66 +140,44 @@ export default function Checkout() {
 
     if (error) throw new Error(error.message);
     if (!data?.success) throw new Error(data?.error || "Failed to create order");
-
-    // Mark order paid with payment reference
-    await supabase
-      .from("orders")
-      .update({ payment_status: "paid", payment_reference: reference, status: "processing" })
-      .eq("id", data.order.id);
-
     return data.order;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast.error("Please fix the errors in the form");
+      toast.error("Please fix the highlighted fields");
       return;
     }
 
     setIsLoading(true);
     try {
-      await loadPaystack();
+      const order = await createOrder();
 
-      const handler = window.PaystackPop.setup({
-        key: PAYSTACK_PUBLIC_KEY,
-        email: formData.email.trim().toLowerCase(),
-        amount: Math.round(totalPrice * 100), // kobo
-        currency: "NGN",
-        ref: `NGURDAM_${Date.now()}_${Math.floor(Math.random() * 1e6)}`,
-        metadata: {
-          custom_fields: [
-            { display_name: "Customer", variable_name: "customer_name", value: formData.name },
-            { display_name: "Phone", variable_name: "phone", value: formData.phone },
-          ],
-        },
-        callback: function (response: { reference: string }) {
-          (async () => {
-            try {
-              const order = await createOrder(response.reference);
-              clearCart();
-              toast.success("Payment successful!", { description: `Reference: ${response.reference}` });
-              navigate(`/order-confirmation?orderId=${order.id}&token=${order.accessToken}`);
-            } catch (err) {
-              toast.error("Order recording failed", {
-                description: err instanceof Error ? err.message : "Please contact support with your reference.",
-              });
-            } finally {
-              setIsLoading(false);
-            }
-          })();
-        },
-        onClose: function () {
-          toast.info("Payment cancelled");
-          setIsLoading(false);
-        },
+      const message = encodeURIComponent(buildWhatsAppMessage(order.id));
+      const waUrl = `https://wa.me/${BRAND.whatsappNumber}?text=${message}`;
+
+      // Open WhatsApp in a new tab BEFORE async work to keep the user gesture
+      const win = window.open(waUrl, "_blank");
+
+      clearCart();
+      toast.success("Order placed!", {
+        description: "We've opened WhatsApp so you can confirm with us.",
       });
-      handler.openIframe();
-    } catch (error) {
-      console.error(error);
-      toast.error("Could not start payment", {
-        description: error instanceof Error ? error.message : "Please try again.",
+
+      // Fallback if popup blocked
+      if (!win) {
+        window.location.href = waUrl;
+      }
+
+      // Navigate to confirmation
+      navigate(`/order-confirmation?orderId=${order.id}&token=${order.accessToken}`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not place order", {
+        description: err instanceof Error ? err.message : "Please try again.",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -192,102 +187,124 @@ export default function Checkout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 py-8 md:py-12 bg-muted/30">
-        <div className="container max-w-5xl">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+      <main className="flex-1 py-10 md:py-16 bg-honey-cream/30">
+        <div className="container max-w-6xl">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 -ml-3">
+            <ArrowLeft className="w-4 h-4" /> Back
           </Button>
 
-          <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">
-            Secure <span className="text-gradient">Checkout</span>
-          </h1>
-          <p className="text-muted-foreground mb-8">Pay securely with Paystack — cards, bank transfer & USSD.</p>
+          <div className="mb-10 max-w-2xl">
+            <p className="text-xs uppercase tracking-[0.2em] text-honey-deep font-medium mb-2">Checkout</p>
+            <h1 className="font-display text-4xl md:text-5xl leading-tight">
+              Finish your order on <span className="italic text-honey-deep">WhatsApp</span>
+            </h1>
+            <p className="text-muted-foreground mt-3 leading-relaxed">
+              Fill in your delivery details, then we'll open WhatsApp so you can
+              confirm pricing, delivery and payment directly with our team.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-5 gap-8">
-            <div className="md:col-span-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-display">Delivery Information</CardTitle>
+          <div className="grid lg:grid-cols-5 gap-8">
+            <div className="lg:col-span-3 space-y-6">
+              <Card className="border-border/60 shadow-card">
+                <CardHeader className="border-b border-border/60">
+                  <CardTitle className="font-display text-2xl flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-honey-deep" /> Delivery Details
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-5">
+                <CardContent className="pt-6">
+                  <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name *</Label>
-                        <Input id="name" value={formData.name}
+                      <Field id="name" label="Full Name" required error={errors.name}>
+                        <Input id="name" autoComplete="name" value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className={errors.name ? "border-destructive" : ""} />
-                        {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number *</Label>
-                        <Input id="phone" type="tel" placeholder="08012345678" value={formData.phone}
+                          className={errors.name ? "border-destructive" : ""}
+                          placeholder="Jane Doe" />
+                      </Field>
+                      <Field id="phone" label="Phone Number" required error={errors.phone}>
+                        <Input id="phone" type="tel" autoComplete="tel"
+                          placeholder="08012345678"
+                          value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           className={errors.phone ? "border-destructive" : ""} />
-                        {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
-                      </div>
+                      </Field>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input id="email" type="email" value={formData.email}
+                    <Field id="email" label="Email (optional)" error={errors.email}>
+                      <Input id="email" type="email" autoComplete="email"
+                        placeholder="you@example.com"
+                        value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className={errors.email ? "border-destructive" : ""} />
-                      {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
-                    </div>
+                    </Field>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Delivery Address *</Label>
-                      <Textarea id="address" rows={3} value={formData.address}
+                    <Field id="address" label="Delivery Address" required error={errors.address}>
+                      <Textarea id="address" rows={2} autoComplete="street-address"
+                        placeholder="House number, street, area"
+                        value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         className={errors.address ? "border-destructive" : ""} />
-                      {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
+                    </Field>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <Field id="city" label="City" required error={errors.city}>
+                        <Input id="city" autoComplete="address-level2"
+                          placeholder="Sokoto"
+                          value={formData.city}
+                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          className={errors.city ? "border-destructive" : ""} />
+                      </Field>
+                      <Field id="state" label="State" required error={errors.state}>
+                        <Input id="state" autoComplete="address-level1"
+                          placeholder="Sokoto State"
+                          value={formData.state}
+                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                          className={errors.state ? "border-destructive" : ""} />
+                      </Field>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="notes">Order Notes (Optional)</Label>
-                      <Textarea id="notes" rows={2} value={formData.notes}
+                    <Field id="notes" label="Order Notes (optional)">
+                      <Textarea id="notes" rows={2}
+                        placeholder="Landmark, gate color, preferred delivery time..."
+                        value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })} />
-                    </div>
+                    </Field>
 
-                    <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+                    <Button type="submit" variant="honey" size="lg" className="w-full" disabled={isLoading}>
                       {isLoading ? (
-                        <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</>
+                        <><Loader2 className="w-5 h-5 animate-spin" /> Preparing...</>
                       ) : (
-                        <><CreditCard className="w-5 h-5 mr-2" /> Pay {formatPrice(totalPrice)} with Paystack</>
+                        <><MessageCircle className="w-5 h-5" /> Continue on WhatsApp · {formatPrice(totalPrice)}</>
                       )}
                     </Button>
 
-                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                      <ShieldCheck className="w-4 h-4 text-primary" />
-                      Secured by Paystack · 256-bit SSL encryption
-                    </div>
+                    <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-1">
+                      <ShieldCheck className="w-4 h-4 text-success" />
+                      Your details stay private. We confirm payment over WhatsApp.
+                    </p>
                   </form>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="md:col-span-2">
-              <Card className="sticky top-4">
-                <CardHeader>
-                  <CardTitle className="font-display flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5" /> Order Summary
+            <div className="lg:col-span-2">
+              <Card className="sticky top-24 border-border/60 shadow-card">
+                <CardHeader className="border-b border-border/60">
+                  <CardTitle className="font-display text-xl flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5 text-honey-deep" /> Order Summary
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="pt-5 space-y-4">
                   {items.map((item) => (
                     <div key={item.productId} className="flex gap-3">
-                      <div className="w-14 h-14 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0">
-                        {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-lg">🍯</div>
-                        )}
+                      <div className="w-16 h-16 bg-honey-cream rounded-lg overflow-hidden flex-shrink-0">
+                        <img src={item.imageUrl || singleJar} alt={item.productName}
+                          className="w-full h-full object-cover" loading="lazy" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{item.productName}</p>
+                        <p className="font-semibold text-sm leading-tight">{item.productName}</p>
                         <Badge variant="outline" className="mt-1 text-[10px]">Qty {item.quantity}</Badge>
-                        <p className="text-sm font-bold text-primary mt-1">
+                        <p className="text-sm font-display text-honey-deep mt-1.5">
                           {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
@@ -297,16 +314,16 @@ export default function Checkout() {
                   <Separator />
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>{formatPrice(totalPrice)}</span>
+                    <span className="font-medium">{formatPrice(totalPrice)}</span>
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Delivery</span>
-                    <span>Arranged after payment</span>
+                    <span>Confirmed on WhatsApp</span>
                   </div>
                   <Separator />
-                  <div className="flex justify-between items-center">
-                    <span className="text-base font-bold">Total</span>
-                    <span className="font-display text-2xl font-extrabold text-primary">{formatPrice(totalPrice)}</span>
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-base font-semibold">Total</span>
+                    <span className="font-display text-3xl text-honey-deep">{formatPrice(totalPrice)}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -315,6 +332,18 @@ export default function Checkout() {
         </div>
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function Field({ id, label, required, error, children }: { id: string; label: string; required?: boolean; error?: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id} className="text-sm font-medium">
+        {label} {required && <span className="text-destructive">*</span>}
+      </Label>
+      {children}
+      {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
     </div>
   );
 }

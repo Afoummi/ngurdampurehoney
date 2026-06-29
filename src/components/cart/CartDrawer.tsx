@@ -57,12 +57,13 @@ export function CartDrawer() {
                 <div className="space-y-4">
                   {items.map((item) => (
                     <div key={item.productId} className="flex gap-4 p-3 bg-card rounded-lg">
-                      <div className="w-16 h-16 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0">
-                        {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-2xl">🍯</div>
-                        )}
+                      <div className="w-16 h-16 bg-honey-cream rounded-md overflow-hidden flex-shrink-0">
+                        <img
+                          src={item.imageUrl || "/placeholder.svg"}
+                          alt={item.productName}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -96,8 +97,8 @@ export function CartDrawer() {
                   <span className="text-lg font-semibold">Total</span>
                   <span className="text-xl font-bold text-primary">{formatPrice(totalPrice)}</span>
                 </div>
-                <Button onClick={handleCheckout} className="w-full bg-primary hover:bg-primary/90" size="lg" disabled={items.length === 0}>
-                  <ArrowRight className="w-4 h-4 mr-2" />
+                <Button onClick={handleCheckout} variant="honey" className="w-full" size="lg" disabled={items.length === 0}>
+                  <ArrowRight className="w-4 h-4" />
                   Proceed to Checkout
                 </Button>
               </div>
