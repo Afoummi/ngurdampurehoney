@@ -6,12 +6,13 @@ import { Menu, User, LogOut, ShoppingBag, Settings, Package, Shield } from "luci
 import { useState } from "react";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { useAuth } from "@/hooks/useAuth";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/products", label: "Shop" },
-  { href: "/about", label: "About" },
-  { href: "/blog", label: "Blog" },
+  { href: "/about", label: "Our Story" },
+  { href: "/blog", label: "Journal" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -27,38 +28,45 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-honey-gradient flex items-center justify-center">
-            <span className="text-xl font-bold text-primary-foreground">🍯</span>
-          </div>
-          <span className="font-display text-xl font-bold text-foreground">Ngurdam Honey</span>
-        </Link>
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+      <div className="container flex h-18 md:h-20 items-center justify-between py-3">
+        <BrandLogo />
 
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link key={link.href} to={link.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === link.href ? "text-primary" : "text-muted-foreground"
-              }`}>
-              {link.label}
-            </Link>
-          ))}
+        <nav className="hidden md:flex items-center gap-1" aria-label="Main">
+          {navLinks.map((link) => {
+            const active = location.pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  active
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {link.label}
+                {active && (
+                  <span className="absolute left-1/2 -translate-x-1/2 -bottom-0.5 w-6 h-0.5 rounded-full bg-honey" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <CartDrawer />
 
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" aria-label="Account menu">
                   <User className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <div className="px-2 py-1.5">
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-3 py-2.5">
+                  <p className="text-xs text-muted-foreground">Signed in as</p>
                   <p className="text-sm font-medium truncate">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
@@ -85,59 +93,61 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex">
               Sign In
             </Button>
           )}
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px]">
-              <nav className="flex flex-col gap-4 mt-8">
+              <nav className="flex flex-col gap-1 mt-10" aria-label="Mobile">
                 {navLinks.map((link) => (
                   <Link key={link.href} to={link.href} onClick={() => setIsOpen(false)}
-                    className={`text-lg font-medium transition-colors hover:text-primary ${
-                      location.pathname === link.href ? "text-primary" : "text-muted-foreground"
+                    className={`px-3 py-3 rounded-md text-base font-medium transition-colors ${
+                      location.pathname === link.href
+                        ? "bg-honey-cream text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}>
                     {link.label}
                   </Link>
                 ))}
 
-                {user ? (
-                  <>
-                    <div className="border-t pt-4 mt-4">
+                <div className="border-t pt-4 mt-4 flex flex-col gap-1">
+                  {user ? (
+                    <>
                       <Link to="/account/orders" onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
-                        <ShoppingBag className="h-5 w-5" /> My Orders
+                        className="px-3 py-3 rounded-md flex items-center gap-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                        <ShoppingBag className="h-4 w-4" /> My Orders
                       </Link>
-                    </div>
-                    {isModerator && !isAdmin && (
-                      <Link to="/moderator" onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
-                        <Shield className="h-5 w-5" /> Moderator Dashboard
-                      </Link>
-                    )}
-                    {isAdmin && (
-                      <Link to="/admin" onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
-                        <Settings className="h-5 w-5" /> Admin Dashboard
-                      </Link>
-                    )}
-                    <button onClick={() => { handleSignOut(); setIsOpen(false); }}
-                      className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-primary">
-                      <LogOut className="h-5 w-5" /> Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <Link to="/auth" onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 text-lg font-medium text-primary">
-                    <User className="h-5 w-5" /> Sign In
-                  </Link>
-                )}
+                      {isModerator && !isAdmin && (
+                        <Link to="/moderator" onClick={() => setIsOpen(false)}
+                          className="px-3 py-3 rounded-md flex items-center gap-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                          <Shield className="h-4 w-4" /> Moderator
+                        </Link>
+                      )}
+                      {isAdmin && (
+                        <Link to="/admin" onClick={() => setIsOpen(false)}
+                          className="px-3 py-3 rounded-md flex items-center gap-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                          <Settings className="h-4 w-4" /> Admin
+                        </Link>
+                      )}
+                      <button onClick={() => { handleSignOut(); setIsOpen(false); }}
+                        className="px-3 py-3 rounded-md flex items-center gap-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground text-left">
+                        <LogOut className="h-4 w-4" /> Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <Link to="/auth" onClick={() => setIsOpen(false)}
+                      className="px-3 py-3 rounded-md flex items-center gap-2 text-sm font-medium text-honey-deep">
+                      <User className="h-4 w-4" /> Sign In
+                    </Link>
+                  )}
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
