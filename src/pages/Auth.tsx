@@ -199,16 +199,16 @@ export default function Auth() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
       </div>
       
-      <Card className="w-full max-w-md relative">
+      <Card className="w-full max-w-md relative border-border/60 shadow-lift">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-honey-gradient flex items-center justify-center mb-4">
-            <span className="text-3xl">🍯</span>
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-honey-cream flex items-center justify-center mb-4 ring-1 ring-honey/30">
+            <span className="font-display text-3xl text-honey-deep">N</span>
           </div>
-          <CardTitle className="font-display text-2xl">AB Sardauna</CardTitle>
+          <CardTitle className="font-display text-3xl">Ngurdam Honey</CardTitle>
           <CardDescription>
             {view === "forgot" && "Reset your password"}
             {view === "reset" && "Create a new password"}
-            {(view === "login" || view === "signup") && "Welcome to Ngurdam Pure Honey"}
+            {(view === "login" || view === "signup") && "Sign in or create an account"}
           </CardDescription>
         </CardHeader>
         
