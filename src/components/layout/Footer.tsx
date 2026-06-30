@@ -72,6 +72,14 @@ export function Footer() {
               <li className="flex items-start gap-3 text-primary-foreground/85">
                 <MapPin className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
                 <span>
+                  <span className="block text-honey/90 text-xs uppercase tracking-wider mb-0.5">Honey Origin</span>
+                  Gembu, Sardauna LGA,<br />Taraba State, Nigeria.
+                </span>
+              </li>
+              <li className="flex items-start gap-3 text-primary-foreground/85">
+                <MapPin className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
+                <span>
+                  <span className="block text-honey/90 text-xs uppercase tracking-wider mb-0.5">Packaging & Office</span>
                   {BRAND.address.line1},<br />
                   {BRAND.address.line2},<br />
                   {BRAND.address.line3}.
