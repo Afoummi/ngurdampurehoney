@@ -11,7 +11,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingCart, Minus, Plus, ArrowLeft, ShieldCheck, Truck, Leaf } from "lucide-react";
-import singleJar from "@/assets/photos/single-jar.jpg";
+import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 export default function ProductDetail() {
   const { handle } = useParams<{ handle: string }>();
@@ -99,7 +99,7 @@ export default function ProductDetail() {
           <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
             <div className="space-y-4">
               <div className="aspect-square rounded-3xl overflow-hidden bg-honey-cream shadow-lift">
-                <img src={product.image_url || singleJar} alt={product.name}
+                <img src={product.image_url || jarsLineup} alt={product.name}
                   className="w-full h-full object-cover" />
               </div>
             </div>
