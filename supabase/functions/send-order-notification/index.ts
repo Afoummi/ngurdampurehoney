@@ -146,7 +146,8 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="background: #333; color: white; padding: 15px; text-align: center;">
-            <p style="margin: 0;">AB Sardauna - Ngurdam Pure Honey</p>
+            <p style="margin: 0;">Ngurdam Honey — Pure honey from Gembu, Taraba. Packaged in Sokoto by AB Sardauna Ngurdam Ventures.</p>
+            <p style="margin: 4px 0 0; color: #999;">NAFDAC Reg. No. A8-121062L</p>
           </div>
         </div>
       `
@@ -201,7 +202,8 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="background: #333; color: white; padding: 15px; text-align: center;">
-            <p style="margin: 0;">AB Sardauna - Ngurdam Pure Honey</p>
+            <p style="margin: 0;">Ngurdam Honey — Pure honey from Gembu, Taraba. Packaged in Sokoto by AB Sardauna Ngurdam Ventures.</p>
+            <p style="margin: 4px 0 0; color: #999;">NAFDAC Reg. No. A8-121062L</p>
             <p style="margin: 5px 0 0 0; font-size: 12px;">Premium, 100% natural honey</p>
           </div>
         </div>

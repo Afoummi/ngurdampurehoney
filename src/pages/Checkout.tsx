@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { Loader2, ShoppingBag, ArrowLeft, ShieldCheck, MessageCircle, MapPin } from "lucide-react";
 import { z } from "zod";
 import { BRAND } from "@/lib/brand";
-import singleJar from "@/assets/photos/single-jar.jpg";
+import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(2, "Please enter your full name").max(100),
@@ -249,14 +249,14 @@ export default function Checkout() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <Field id="city" label="City" required error={errors.city}>
                         <Input id="city" autoComplete="address-level2"
-                          placeholder="Sokoto"
+                          placeholder="e.g. Lagos"
                           value={formData.city}
                           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                           className={errors.city ? "border-destructive" : ""} />
                       </Field>
                       <Field id="state" label="State" required error={errors.state}>
                         <Input id="state" autoComplete="address-level1"
-                          placeholder="Sokoto State"
+                          placeholder="e.g. Lagos State"
                           value={formData.state}
                           onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                           className={errors.state ? "border-destructive" : ""} />
@@ -298,7 +298,7 @@ export default function Checkout() {
                   {items.map((item) => (
                     <div key={item.productId} className="flex gap-3">
                       <div className="w-16 h-16 bg-honey-cream rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={item.imageUrl || singleJar} alt={item.productName}
+                        <img src={item.imageUrl || jarsLineup} alt={item.productName}
                           className="w-full h-full object-cover" loading="lazy" />
                       </div>
                       <div className="flex-1 min-w-0">

@@ -25,7 +25,7 @@ const blogPosts = [
   {
     id: 3,
     title: "Meet Our Beekeepers: Stories from the Field",
-    excerpt: "Go behind the scenes and meet the dedicated beekeepers who make AB Sardauna honey possible. Their stories of passion and commitment.",
+    excerpt: "Go behind the scenes and meet the dedicated beekeepers in the highlands of Gembu, Taraba State, who make Ngurdam Honey possible.",
     date: "December 5, 2024",
     category: "Community",
     image: "🐝",

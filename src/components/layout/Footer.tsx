@@ -72,6 +72,14 @@ export function Footer() {
               <li className="flex items-start gap-3 text-primary-foreground/85">
                 <MapPin className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
                 <span>
+                  <span className="block text-honey/90 text-xs uppercase tracking-wider mb-0.5">Honey Origin</span>
+                  Gembu, Sardauna LGA,<br />Taraba State, Nigeria.
+                </span>
+              </li>
+              <li className="flex items-start gap-3 text-primary-foreground/85">
+                <MapPin className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
+                <span>
+                  <span className="block text-honey/90 text-xs uppercase tracking-wider mb-0.5">Packaging & Office</span>
                   {BRAND.address.line1},<br />
                   {BRAND.address.line2},<br />
                   {BRAND.address.line3}.
@@ -95,7 +103,10 @@ export function Footer() {
 
         {/* Legal */}
         <div className="border-t border-primary-foreground/10 mt-12 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-primary-foreground/60">
-          <p>&copy; {new Date().getFullYear()} {BRAND.legalName}. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} {BRAND.legalName}. All rights reserved.
+            <span className="block md:inline md:ml-2 text-honey/80">NAFDAC Reg. No. {BRAND.nafdacNumber}</span>
+          </p>
           <div className="flex gap-5">
             <Link to="/privacy" className="hover:text-honey">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-honey">Terms &amp; Conditions</Link>

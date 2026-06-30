@@ -2,7 +2,14 @@
 export const BRAND = {
   productName: "NGURDAM HONEY",
   legalName: "AB SARDAUNA NGURDAM VENTURES",
-  tagline: "Pure. Natural. Nigerian.",
+  tagline: "Pure. Natural. Goodness.",
+  nafdacNumber: "A8-121062L",
+  origin: {
+    short: "Gembu, Taraba State",
+    full: "Gembu, Sardauna Local Government Area, Taraba State, Nigeria",
+    region: "Sardauna LGA",
+    state: "Taraba State",
+  },
   address: {
     line1: "Arkilla Area, Behind Alkanci Plaza",
     line2: "Wamakko Local Government Area",

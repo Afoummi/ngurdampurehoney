@@ -11,7 +11,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingCart, Minus, Plus, ArrowLeft, ShieldCheck, Truck, Leaf } from "lucide-react";
-import singleJar from "@/assets/photos/single-jar.jpg";
+import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 export default function ProductDetail() {
   const { handle } = useParams<{ handle: string }>();
@@ -99,7 +99,7 @@ export default function ProductDetail() {
           <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
             <div className="space-y-4">
               <div className="aspect-square rounded-3xl overflow-hidden bg-honey-cream shadow-lift">
-                <img src={product.image_url || singleJar} alt={product.name}
+                <img src={product.image_url || jarsLineup} alt={product.name}
                   className="w-full h-full object-cover" />
               </div>
             </div>
@@ -160,11 +160,23 @@ export default function ProductDetail() {
                 <Trust icon={Truck} label="Nationwide" />
               </div>
 
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-honey-cream border border-honey/30 text-honey-deep font-medium">
+                  NAFDAC Reg. A8-121062L
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/60 border border-border/60">
+                  Sourced: Gembu, Taraba
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/60 border border-border/60">
+                  Packaged: Sokoto
+                </span>
+              </div>
+
               <Accordion type="single" collapsible className="border-t border-border/60 pt-4">
                 <AccordionItem value="desc">
                   <AccordionTrigger>About this honey</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed">
-                    {product.description || "Raw, unfiltered honey harvested by hand in Sokoto State."} It crystallizes naturally over time — gently warm to restore its smooth flow.
+                    {product.description || "Raw, unfiltered honey harvested by hand from the highlands of Gembu, Sardauna LGA, Taraba State, and professionally packaged in Sokoto. NAFDAC Reg. A8-121062L."} It crystallizes naturally over time — gently warm to restore its smooth flow.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="ship">
