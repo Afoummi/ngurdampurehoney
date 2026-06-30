@@ -249,7 +249,7 @@ export default function Checkout() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <Field id="city" label="City" required error={errors.city}>
                         <Input id="city" autoComplete="address-level2"
-                          placeholder="Sokoto"
+                          placeholder="e.g. Lagos"
                           value={formData.city}
                           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                           className={errors.city ? "border-destructive" : ""} />

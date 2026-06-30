@@ -164,7 +164,7 @@ export default function ProductDetail() {
                 <AccordionItem value="desc">
                   <AccordionTrigger>About this honey</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed">
-                    {product.description || "Raw, unfiltered honey harvested by hand in Sokoto State."} It crystallizes naturally over time — gently warm to restore its smooth flow.
+                    {product.description || "Raw, unfiltered honey harvested by hand from the highlands of Gembu, Sardauna LGA, Taraba State, and professionally packaged in Sokoto. NAFDAC Reg. A8-121062L."} It crystallizes naturally over time — gently warm to restore its smooth flow.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="ship">

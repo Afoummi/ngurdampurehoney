@@ -3,7 +3,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const faqs = [
   {
     q: "Is Ngurdam Honey 100% pure and raw?",
-    a: "Yes. Every jar contains nothing but raw, unfiltered honey from Sokoto apiaries. No sugar, no syrup, no additives — ever.",
+    a: "Yes. Every jar contains nothing but raw, unfiltered honey harvested from the highlands of Gembu, Sardauna LGA, Taraba State. No sugar, no syrup, no additives — ever. NAFDAC Registered (A8-121062L).",
+  },
+  {
+    q: "Where does Ngurdam Honey come from?",
+    a: "Our honey is sourced from experienced local beekeepers in the highlands of Gembu, Sardauna Local Government Area, Taraba State. It is then carefully processed, quality-checked, and professionally packaged in Sokoto by AB Sardauna Ngurdam Ventures.",
   },
   {
     q: "How can I tell that my honey is authentic?",

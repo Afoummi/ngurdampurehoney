@@ -21,8 +21,9 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-              Ngurdam Honey is harvested by hand from Sokoto apiaries, unfiltered
-              and unprocessed — golden, fragrant, and full of nature's goodness.
+              Ngurdam Honey is harvested by hand from the pristine highlands of
+              Gembu, Taraba State — unfiltered, unprocessed, and full of nature's
+              goodness. Carefully packaged in Sokoto for families across Nigeria.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -61,7 +62,7 @@ export function HeroSection() {
                   <p className="text-xs uppercase tracking-[0.2em] opacity-80">Featured</p>
                   <p className="font-display text-2xl mt-1">Raw Wildflower</p>
                 </div>
-                <span className="text-xs uppercase tracking-[0.2em] opacity-80">Sokoto, Nigeria</span>
+                <span className="text-xs uppercase tracking-[0.2em] opacity-80">Gembu, Taraba</span>
               </div>
             </div>
 
