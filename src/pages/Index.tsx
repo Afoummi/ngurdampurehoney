@@ -21,6 +21,8 @@ export default function Index() {
       <main className="flex-1" id="main">
         <HeroSection />
 
+        <TrustSection />
+
         <WhyChooseSection />
 
         {/* Featured Products */}
