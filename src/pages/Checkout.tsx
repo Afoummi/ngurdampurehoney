@@ -256,7 +256,7 @@ export default function Checkout() {
                       </Field>
                       <Field id="state" label="State" required error={errors.state}>
                         <Input id="state" autoComplete="address-level1"
-                          placeholder="Sokoto State"
+                          placeholder="e.g. Lagos State"
                           value={formData.state}
                           onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                           className={errors.state ? "border-destructive" : ""} />

@@ -17,22 +17,38 @@ export default function About() {
               <div className="space-y-6">
                 <p className="text-xs uppercase tracking-[0.2em] text-honey-deep font-medium">Our Story</p>
                 <h1 className="font-display text-5xl md:text-6xl leading-tight">
-                  Pure honey, <span className="italic text-honey-deep">straight from Sokoto.</span>
+                  Pure honey, <span className="italic text-honey-deep">straight from the highlands of Gembu.</span>
                 </h1>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  {BRAND.legalName} was founded with a simple promise: bring the
-                  purest, most authentic honey from Nigerian apiaries directly to your
-                  kitchen. Ngurdam Honey is the heart of that promise — raw,
-                  unprocessed, and tasting exactly like the wildflowers it came from.
+                  {BRAND.legalName} was founded with a simple mission: to bring the
+                  purest, most authentic honey from the beautiful highlands of
+                  Gembu, Sardauna Local Government Area, Taraba State, directly to
+                  families across Nigeria.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  We work directly with beekeepers in Sokoto State who share our
-                  commitment to quality, sustainability, and fair trade. Every jar is
-                  hand-bottled and lab-tested before it reaches your home.
+                  Ngurdam Honey is 100% pure, raw, and naturally harvested,
+                  preserving its rich flavour, aroma, and nutritional benefits just
+                  as nature intended.
                 </p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
-                  <MapPin className="w-4 h-4 text-honey-deep" />
-                  Based in {BRAND.address.line3.replace(", Nigeria", "")}
+                <p className="text-muted-foreground leading-relaxed">
+                  We proudly work with experienced local beekeepers who practice
+                  sustainable and ethical harvesting methods. Every bottle is
+                  carefully processed, quality-checked, and professionally packaged
+                  in Sokoto to ensure our customers receive premium honey they can
+                  trust.
+                </p>
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground pt-2">
+                  <span className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-honey-deep" />
+                    Sourced in {BRAND.origin.short}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-honey-deep" />
+                    Packaged in Sokoto
+                  </span>
+                </div>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-honey-cream border border-honey/30 text-xs font-medium text-honey-deep mt-2">
+                  NAFDAC Reg. No. {BRAND.nafdacNumber}
                 </div>
               </div>
 
