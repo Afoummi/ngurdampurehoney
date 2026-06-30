@@ -160,6 +160,18 @@ export default function ProductDetail() {
                 <Trust icon={Truck} label="Nationwide" />
               </div>
 
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-honey-cream border border-honey/30 text-honey-deep font-medium">
+                  NAFDAC Reg. A8-121062L
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/60 border border-border/60">
+                  Sourced: Gembu, Taraba
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/60 border border-border/60">
+                  Packaged: Sokoto
+                </span>
+              </div>
+
               <Accordion type="single" collapsible className="border-t border-border/60 pt-4">
                 <AccordionItem value="desc">
                   <AccordionTrigger>About this honey</AccordionTrigger>
