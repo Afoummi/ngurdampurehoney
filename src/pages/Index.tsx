@@ -5,6 +5,7 @@ import { WhyChooseSection } from "@/components/home/WhyChooseSection";
 import { HealthBenefitsSection } from "@/components/home/HealthBenefitsSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { ContactCTASection } from "@/components/home/ContactCTASection";
+import { TrustSection } from "@/components/home/TrustSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { PromoBanner } from "@/components/home/PromoBanner";
 import { ProductGrid } from "@/components/products/ProductGrid";
