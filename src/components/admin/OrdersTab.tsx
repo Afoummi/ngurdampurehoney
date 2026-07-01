@@ -354,7 +354,9 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
                 <TableCell className="text-muted-foreground">
                   {format(new Date(order.created_at), 'MMM dd, yyyy')}
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button 
