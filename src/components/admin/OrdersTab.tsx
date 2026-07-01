@@ -6,9 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Eye, Package, Printer } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, Eye, Package, Printer, Archive, ArchiveRestore, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Order {
   id: string;
@@ -23,11 +29,13 @@ interface Order {
   payment_status: string;
   notes: string | null;
   created_at: string;
+  archived_at: string | null;
 }
 
 interface OrdersTabProps {
   onOrderUpdate: () => void;
 }
+
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
@@ -49,11 +57,14 @@ const paymentStatusColors: Record<string, string> = {
 const STATUS_FLOW = ["pending", "processing", "in_transit", "delivered"] as const;
 
 export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
+  const { isAdmin } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lowStockCount, setLowStockCount] = useState(0);
+  const [view, setView] = useState<"active" | "archived">("active");
+
 
   useEffect(() => {
     fetchOrders();
@@ -195,7 +206,50 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
     }
   };
 
+
+  const archiveOrder = async (orderId: string, archive: boolean) => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ archived_at: archive ? new Date().toISOString() : null })
+        .eq("id", orderId);
+      if (error) throw error;
+      toast.success(archive ? "Order archived" : "Order restored");
+      fetchOrders();
+      onOrderUpdate();
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to update archive state");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    if (!isAdmin) {
+      toast.error("Only admins can permanently delete orders");
+      return;
+    }
+    setIsUpdating(true);
+    try {
+      // Order items are removed via ON DELETE CASCADE where configured; also attempt explicit cleanup.
+      await supabase.from("order_items").delete().eq("order_id", orderId);
+      const { error } = await supabase.from("orders").delete().eq("id", orderId);
+      if (error) throw error;
+      toast.success("Order permanently deleted");
+      fetchOrders();
+      onOrderUpdate();
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Failed to delete order");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   if (isLoading) {
+
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -215,8 +269,12 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
     );
   }
 
-  const totalSales = orders.filter(o => o.payment_status === 'paid').reduce((s, o) => s + Number(o.total_amount), 0);
-  const pendingCount = orders.filter(o => o.status === 'pending').length;
+  const activeOrders = orders.filter(o => !o.archived_at);
+  const archivedOrders = orders.filter(o => !!o.archived_at);
+  const visibleOrders = view === "active" ? activeOrders : archivedOrders;
+
+  const totalSales = activeOrders.filter(o => o.payment_status === 'paid').reduce((s, o) => s + Number(o.total_amount), 0);
+  const pendingCount = activeOrders.filter(o => o.status === 'pending').length;
 
   return (
     <div className="space-y-6">
@@ -236,11 +294,27 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
       </div>
 
     <Card>
-      <CardHeader>
-        <CardTitle>Orders</CardTitle>
-        <CardDescription>Manage customer orders and track deliveries</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <div>
+          <CardTitle>Orders</CardTitle>
+          <CardDescription>Manage customer orders and track deliveries</CardDescription>
+        </div>
+        <Tabs value={view} onValueChange={(v) => setView(v as "active" | "archived")}>
+          <TabsList>
+            <TabsTrigger value="active">Active ({activeOrders.length})</TabsTrigger>
+            <TabsTrigger value="archived">Archived ({archivedOrders.length})</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
       <CardContent>
+        {visibleOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Package className="h-10 w-10 text-muted-foreground mb-3" />
+            <p className="text-muted-foreground">
+              {view === "active" ? "No active orders." : "No archived orders."}
+            </p>
+          </div>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow>
@@ -250,11 +324,12 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
               <TableHead>Status</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {visibleOrders.map((order) => (
+
               <TableRow key={order.id}>
                 <TableCell className="font-mono text-sm">
                   {order.id.slice(0, 8)}...
@@ -279,7 +354,9 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
                 <TableCell className="text-muted-foreground">
                   {format(new Date(order.created_at), 'MMM dd, yyyy')}
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button 
@@ -385,13 +462,71 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
                       </div>
                     </DialogContent>
                   </Dialog>
+
+                  {!order.archived_at ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => archiveOrder(order.id, true)}
+                      disabled={isUpdating}
+                      title="Archive order"
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => archiveOrder(order.id, false)}
+                      disabled={isUpdating}
+                      title="Restore order"
+                    >
+                      <ArchiveRestore className="h-4 w-4" />
+                    </Button>
+                  )}
+
+                  {isAdmin && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          disabled={isUpdating}
+                          title="Delete order permanently"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete order permanently?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action is <strong>irreversible</strong>. Order #{order.id.slice(0, 8)} and all its items will be permanently removed from the database. Consider archiving instead if you may need to reference this order later.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteOrder(order.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete permanently
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        )}
       </CardContent>
     </Card>
     </div>
+
   );
 }
