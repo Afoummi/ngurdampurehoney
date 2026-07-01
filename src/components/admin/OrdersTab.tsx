@@ -269,8 +269,12 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
     );
   }
 
-  const totalSales = orders.filter(o => o.payment_status === 'paid').reduce((s, o) => s + Number(o.total_amount), 0);
-  const pendingCount = orders.filter(o => o.status === 'pending').length;
+  const activeOrders = orders.filter(o => !o.archived_at);
+  const archivedOrders = orders.filter(o => !!o.archived_at);
+  const visibleOrders = view === "active" ? activeOrders : archivedOrders;
+
+  const totalSales = activeOrders.filter(o => o.payment_status === 'paid').reduce((s, o) => s + Number(o.total_amount), 0);
+  const pendingCount = activeOrders.filter(o => o.status === 'pending').length;
 
   return (
     <div className="space-y-6">
@@ -290,11 +294,27 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
       </div>
 
     <Card>
-      <CardHeader>
-        <CardTitle>Orders</CardTitle>
-        <CardDescription>Manage customer orders and track deliveries</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <div>
+          <CardTitle>Orders</CardTitle>
+          <CardDescription>Manage customer orders and track deliveries</CardDescription>
+        </div>
+        <Tabs value={view} onValueChange={(v) => setView(v as "active" | "archived")}>
+          <TabsList>
+            <TabsTrigger value="active">Active ({activeOrders.length})</TabsTrigger>
+            <TabsTrigger value="archived">Archived ({archivedOrders.length})</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
       <CardContent>
+        {visibleOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Package className="h-10 w-10 text-muted-foreground mb-3" />
+            <p className="text-muted-foreground">
+              {view === "active" ? "No active orders." : "No archived orders."}
+            </p>
+          </div>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow>
@@ -304,11 +324,12 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
               <TableHead>Status</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {visibleOrders.map((order) => (
+
               <TableRow key={order.id}>
                 <TableCell className="font-mono text-sm">
                   {order.id.slice(0, 8)}...
