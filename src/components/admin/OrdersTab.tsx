@@ -206,7 +206,50 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
     }
   };
 
+
+  const archiveOrder = async (orderId: string, archive: boolean) => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ archived_at: archive ? new Date().toISOString() : null })
+        .eq("id", orderId);
+      if (error) throw error;
+      toast.success(archive ? "Order archived" : "Order restored");
+      fetchOrders();
+      onOrderUpdate();
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to update archive state");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    if (!isAdmin) {
+      toast.error("Only admins can permanently delete orders");
+      return;
+    }
+    setIsUpdating(true);
+    try {
+      // Order items are removed via ON DELETE CASCADE where configured; also attempt explicit cleanup.
+      await supabase.from("order_items").delete().eq("order_id", orderId);
+      const { error } = await supabase.from("orders").delete().eq("id", orderId);
+      if (error) throw error;
+      toast.success("Order permanently deleted");
+      fetchOrders();
+      onOrderUpdate();
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Failed to delete order");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   if (isLoading) {
+
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
