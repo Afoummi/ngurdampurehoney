@@ -462,13 +462,71 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
                       </div>
                     </DialogContent>
                   </Dialog>
+
+                  {!order.archived_at ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => archiveOrder(order.id, true)}
+                      disabled={isUpdating}
+                      title="Archive order"
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => archiveOrder(order.id, false)}
+                      disabled={isUpdating}
+                      title="Restore order"
+                    >
+                      <ArchiveRestore className="h-4 w-4" />
+                    </Button>
+                  )}
+
+                  {isAdmin && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          disabled={isUpdating}
+                          title="Delete order permanently"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete order permanently?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action is <strong>irreversible</strong>. Order #{order.id.slice(0, 8)} and all its items will be permanently removed from the database. Consider archiving instead if you may need to reference this order later.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteOrder(order.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete permanently
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        )}
       </CardContent>
     </Card>
     </div>
+
   );
 }
