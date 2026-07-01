@@ -6,9 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Eye, Package, Printer } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, Eye, Package, Printer, Archive, ArchiveRestore, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Order {
   id: string;
@@ -23,11 +29,13 @@ interface Order {
   payment_status: string;
   notes: string | null;
   created_at: string;
+  archived_at: string | null;
 }
 
 interface OrdersTabProps {
   onOrderUpdate: () => void;
 }
+
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
