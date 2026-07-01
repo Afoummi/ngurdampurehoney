@@ -57,11 +57,14 @@ const paymentStatusColors: Record<string, string> = {
 const STATUS_FLOW = ["pending", "processing", "in_transit", "delivered"] as const;
 
 export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
+  const { isAdmin } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lowStockCount, setLowStockCount] = useState(0);
+  const [view, setView] = useState<"active" | "archived">("active");
+
 
   useEffect(() => {
     fetchOrders();
