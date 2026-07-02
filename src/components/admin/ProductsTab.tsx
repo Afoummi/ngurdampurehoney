@@ -293,17 +293,16 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Image URL</Label>
-              <Input value={form.image_url}
-                onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                placeholder="https://example.com/image.jpg" />
+              <Label>Product Image</Label>
+              <ImageUploader
+                value={form.image_url || null}
+                onChange={(url) => setForm({ ...form, image_url: url ?? "" })}
+                folder="products"
+                aspect="square"
+                label="Product image"
+              />
             </div>
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Input value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                placeholder="e.g. Raw Honey, Infused Honey" />
-            </div>
+
           </div>
 
           <DialogFooter>
