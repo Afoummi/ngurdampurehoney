@@ -87,6 +87,9 @@ const App = () => (
               <Route path="inventory" element={<InventoryTab />} />
               <Route path="customers" element={<CustomersTab canManageRoles={false} />} />
               <Route path="newsletter" element={<SubscribersTab />} />
+              <Route path="products" element={<ProductsTab canDelete={false} canCreate />} />
+              <Route path="media" element={<MediaTab />} />
+
             </Route>
 
             <Route path="*" element={<NotFound />} />
