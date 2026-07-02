@@ -55,6 +55,18 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {(isAdmin || isModerator) && (
+            <Button
+              variant="honey"
+              size="sm"
+              onClick={() => navigate(isAdmin ? "/admin" : "/moderator")}
+              className="hidden sm:inline-flex"
+            >
+              <Shield className="h-4 w-4" />
+              {isAdmin ? "Admin Dashboard" : "Moderator"}
+            </Button>
+          )}
+
           <CartDrawer />
 
           {user ? (
@@ -97,6 +109,7 @@ export function Navbar() {
               Sign In
             </Button>
           )}
+
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
