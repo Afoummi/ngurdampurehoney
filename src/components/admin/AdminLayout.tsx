@@ -21,8 +21,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  LayoutDashboard, ShoppingCart, Package, FolderTree, Boxes, Users, Mail, Megaphone,
-  BarChart3, FileText, Settings, UserCog, ShieldCheck,
+  LayoutDashboard, ShoppingCart, Package, Boxes, Users, Mail, Megaphone,
+  BarChart3, FileText, Settings, UserCog, ShieldCheck, Image as ImageIcon,
 } from "lucide-react";
 
 const ADMIN_NAV = [
@@ -39,8 +39,14 @@ const ADMIN_NAV = [
     items: [
       { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
       { to: "/admin/products", label: "Products", icon: Package },
-      { to: "/admin/categories", label: "Categories", icon: FolderTree },
       { to: "/admin/inventory", label: "Inventory", icon: Boxes },
+    ],
+  },
+  {
+    label: "Content",
+    items: [
+      { to: "/admin/media", label: "Media Library", icon: ImageIcon },
+      { to: "/admin/promos", label: "Promo Banners", icon: Megaphone },
     ],
   },
   {
@@ -48,7 +54,6 @@ const ADMIN_NAV = [
     items: [
       { to: "/admin/customers", label: "Customers", icon: Users },
       { to: "/admin/newsletter", label: "Newsletter", icon: Mail },
-      { to: "/admin/promos", label: "Promo Codes", icon: Megaphone },
     ],
   },
   {
@@ -67,12 +72,15 @@ const MODERATOR_NAV = [
     items: [
       { to: "/moderator/overview", label: "Dashboard", icon: LayoutDashboard },
       { to: "/moderator/orders", label: "Orders", icon: ShoppingCart },
+      { to: "/moderator/products", label: "Products", icon: Package },
       { to: "/moderator/inventory", label: "Inventory", icon: Boxes },
+      { to: "/moderator/media", label: "Media", icon: ImageIcon },
       { to: "/moderator/customers", label: "Customers", icon: Users },
       { to: "/moderator/newsletter", label: "Newsletter", icon: Mail },
     ],
   },
 ];
+
 
 interface AdminLayoutProps {
   variant?: "admin" | "moderator";
@@ -201,9 +209,10 @@ export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
               </p>
               <h1 className="font-display text-xl leading-none mt-0.5 truncate">{title}</h1>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate("/")} className="hidden md:inline-flex">
-              <ExternalLink className="w-4 h-4" /> Store
+            <Button variant="honey" size="sm" onClick={() => window.open("/", "_blank", "noopener,noreferrer")} className="hidden md:inline-flex">
+              <ExternalLink className="w-4 h-4" /> View Website
             </Button>
+
           </header>
 
           <main className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">

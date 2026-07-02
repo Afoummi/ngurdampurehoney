@@ -24,7 +24,6 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminOverview from "./pages/admin/Overview";
 import AnalyticsPage from "./pages/admin/Analytics";
 import ReportsPage from "./pages/admin/Reports";
-import CategoriesPage from "./pages/admin/Categories";
 import SecurityPage from "./pages/admin/Security";
 import { OrdersTab } from "./components/admin/OrdersTab";
 import { ProductsTab } from "./components/admin/ProductsTab";
@@ -34,6 +33,8 @@ import { SubscribersTab } from "./components/admin/SubscribersTab";
 import { PromoTab } from "./components/admin/PromoTab";
 import { UsersTab } from "./components/admin/UsersTab";
 import { SettingsTab } from "./components/admin/SettingsTab";
+import { MediaTab } from "./components/admin/MediaTab";
+
 
 const queryClient = new QueryClient();
 
@@ -66,7 +67,7 @@ const App = () => (
               <Route path="overview" element={<AdminOverview />} />
               <Route path="orders" element={<OrdersTab onOrderUpdate={() => {}} />} />
               <Route path="products" element={<ProductsTab canDelete canCreate />} />
-              <Route path="categories" element={<CategoriesPage />} />
+              <Route path="media" element={<MediaTab />} />
               <Route path="inventory" element={<InventoryTab />} />
               <Route path="customers" element={<CustomersTab canManageRoles />} />
               <Route path="newsletter" element={<SubscribersTab />} />
@@ -86,6 +87,9 @@ const App = () => (
               <Route path="inventory" element={<InventoryTab />} />
               <Route path="customers" element={<CustomersTab canManageRoles={false} />} />
               <Route path="newsletter" element={<SubscribersTab />} />
+              <Route path="products" element={<ProductsTab canDelete={false} canCreate />} />
+              <Route path="media" element={<MediaTab />} />
+
             </Route>
 
             <Route path="*" element={<NotFound />} />

@@ -17,7 +17,7 @@ const passwordSchema = z.string().min(6, "Password must be at least 6 characters
 type AuthView = "login" | "signup" | "forgot" | "reset";
 
 export default function Auth() {
-  const { user, isLoading: authLoading, signIn, signUp, resetPassword } = useAuth();
+  const { user, isLoading: authLoading, isAdmin, isModerator, signIn, signUp, resetPassword } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,9 +49,12 @@ export default function Auth() {
 
   useEffect(() => {
     if (user && !authLoading && view !== "reset") {
-      navigate("/");
+      if (isAdmin) navigate("/admin");
+      else if (isModerator) navigate("/moderator");
+      else navigate("/");
     }
-  }, [user, authLoading, navigate, view]);
+  }, [user, authLoading, isAdmin, isModerator, navigate, view]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,9 +97,10 @@ export default function Auth() {
       }
     } else {
       toast.success("Welcome back!");
-      navigate("/");
+      // Role-based redirect handled in useEffect above once role is loaded
     }
   };
+
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
