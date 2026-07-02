@@ -209,9 +209,10 @@ export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
               </p>
               <h1 className="font-display text-xl leading-none mt-0.5 truncate">{title}</h1>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate("/")} className="hidden md:inline-flex">
-              <ExternalLink className="w-4 h-4" /> Store
+            <Button variant="honey" size="sm" onClick={() => window.open("/", "_blank", "noopener,noreferrer")} className="hidden md:inline-flex">
+              <ExternalLink className="w-4 h-4" /> View Website
             </Button>
+
           </header>
 
           <main className="p-4 md:p-8 max-w-[1600px] mx-auto w-full">
