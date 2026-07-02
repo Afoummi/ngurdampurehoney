@@ -39,8 +39,10 @@ export function useSiteMedia(slot: SiteMediaSlot, options?: { includeInactive?: 
     let cancelled = false;
     (async () => {
       setLoading(true);
-      let query = supabase
-        .from("site_media" as never)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = supabase as any;
+      let query = db
+        .from("site_media")
         .select("*")
         .eq("slot", slot)
         .order("sort_order", { ascending: true })
@@ -49,6 +51,7 @@ export function useSiteMedia(slot: SiteMediaSlot, options?: { includeInactive?: 
       if (!options?.includeInactive) {
         query = query.eq("is_active", true);
       }
+
 
       const { data, error } = await query;
       if (cancelled) return;
