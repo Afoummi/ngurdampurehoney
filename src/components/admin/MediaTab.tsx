@@ -107,9 +107,17 @@ export function MediaTab() {
       sort_order: form.sort_order,
       is_active: form.is_active,
     };
+    const client = supabase as unknown as {
+      from: (t: string) => {
+        update: (v: unknown) => { eq: (c: string, v: string) => Promise<{ error: unknown }> };
+        insert: (v: unknown) => Promise<{ error: unknown }>;
+        delete: () => { eq: (c: string, v: string) => Promise<{ error: unknown }> };
+      };
+    };
     const { error } = editing
-      ? await supabase.from("site_media" as never).update(payload).eq("id", editing.id)
-      : await supabase.from("site_media" as never).insert(payload as never);
+      ? await client.from("site_media").update(payload).eq("id", editing.id)
+      : await client.from("site_media").insert(payload);
+
     setSaving(false);
     if (error) {
       toast.error(error.message);
