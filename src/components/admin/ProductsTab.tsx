@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Pencil, Trash2, Package, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Product, formatPrice } from "@/lib/products";
+import { ImageUploader } from "./ImageUploader";
+
 
 interface ProductsTabProps {
   canDelete?: boolean;
