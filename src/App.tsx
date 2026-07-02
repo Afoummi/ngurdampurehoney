@@ -67,7 +67,7 @@ const App = () => (
               <Route path="overview" element={<AdminOverview />} />
               <Route path="orders" element={<OrdersTab onOrderUpdate={() => {}} />} />
               <Route path="products" element={<ProductsTab canDelete canCreate />} />
-              <Route path="categories" element={<CategoriesPage />} />
+              <Route path="media" element={<MediaTab />} />
               <Route path="inventory" element={<InventoryTab />} />
               <Route path="customers" element={<CustomersTab canManageRoles />} />
               <Route path="newsletter" element={<SubscribersTab />} />
