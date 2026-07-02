@@ -24,7 +24,6 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminOverview from "./pages/admin/Overview";
 import AnalyticsPage from "./pages/admin/Analytics";
 import ReportsPage from "./pages/admin/Reports";
-import CategoriesPage from "./pages/admin/Categories";
 import SecurityPage from "./pages/admin/Security";
 import { OrdersTab } from "./components/admin/OrdersTab";
 import { ProductsTab } from "./components/admin/ProductsTab";
@@ -34,6 +33,8 @@ import { SubscribersTab } from "./components/admin/SubscribersTab";
 import { PromoTab } from "./components/admin/PromoTab";
 import { UsersTab } from "./components/admin/UsersTab";
 import { SettingsTab } from "./components/admin/SettingsTab";
+import { MediaTab } from "./components/admin/MediaTab";
+
 
 const queryClient = new QueryClient();
 
