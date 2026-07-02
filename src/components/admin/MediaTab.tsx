@@ -48,16 +48,18 @@ export function MediaTab() {
   });
 
   const slotMeta = SLOTS.find((s) => s.key === activeSlot)!;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any;
 
   const fetchItems = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("site_media" as never)
+    const { data, error } = await db
+      .from("site_media")
       .select("*")
       .eq("slot", activeSlot)
       .order("sort_order", { ascending: true });
     if (error) toast.error(error.message);
-    setItems((data as unknown as SiteMediaEntry[]) ?? []);
+    setItems((data as SiteMediaEntry[]) ?? []);
     setLoading(false);
   };
 
@@ -107,16 +109,9 @@ export function MediaTab() {
       sort_order: form.sort_order,
       is_active: form.is_active,
     };
-    const client = supabase as unknown as {
-      from: (t: string) => {
-        update: (v: unknown) => { eq: (c: string, v: string) => Promise<{ error: unknown }> };
-        insert: (v: unknown) => Promise<{ error: unknown }>;
-        delete: () => { eq: (c: string, v: string) => Promise<{ error: unknown }> };
-      };
-    };
     const { error } = editing
-      ? await client.from("site_media").update(payload).eq("id", editing.id)
-      : await client.from("site_media").insert(payload);
+      ? await db.from("site_media").update(payload).eq("id", editing.id)
+      : await db.from("site_media").insert(payload);
 
     setSaving(false);
     if (error) {
@@ -129,7 +124,7 @@ export function MediaTab() {
   };
 
   const remove = async (m: SiteMediaEntry) => {
-    const { error } = await supabase.from("site_media" as never).delete().eq("id", m.id);
+    const { error } = await db.from("site_media").delete().eq("id", m.id);
     if (error) return toast.error(error.message);
     if (m.storage_path) {
       await supabase.storage.from("product-images").remove([m.storage_path]);
@@ -139,10 +134,11 @@ export function MediaTab() {
   };
 
   const toggleActive = async (m: SiteMediaEntry) => {
-    const { error } = await supabase
-      .from("site_media" as never)
-      .update({ is_active: !m.is_active } as never)
+    const { error } = await db
+      .from("site_media")
+      .update({ is_active: !m.is_active })
       .eq("id", m.id);
+
     if (error) return toast.error(error.message);
     fetchItems();
   };
