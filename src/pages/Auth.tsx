@@ -97,9 +97,10 @@ export default function Auth() {
       }
     } else {
       toast.success("Welcome back!");
-      navigate("/");
+      // Role-based redirect handled in useEffect above once role is loaded
     }
   };
+
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
