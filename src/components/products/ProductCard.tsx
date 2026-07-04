@@ -65,23 +65,20 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        <div className="p-5 space-y-4">
-          <div className="space-y-1.5">
-            <h3 className="font-display text-2xl leading-tight text-foreground group-hover:text-honey-deep transition-colors">
+        <div className="p-4 space-y-3">
+          <div className="space-y-1">
+            <h3 className="font-display text-xl leading-tight text-foreground group-hover:text-honey-deep transition-colors">
               {product.name}
             </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
               {product.description || "Hand-harvested raw honey from Ngurdam apiaries."}
             </p>
           </div>
 
-          <div className="flex items-end justify-between pt-3 border-t border-border/60">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-medium">Price</p>
-              <p className="font-display text-3xl text-foreground leading-none mt-1">
-                {formatPrice(product.price)}
-              </p>
-            </div>
+          <div className="flex items-center justify-between pt-3 border-t border-border/60">
+            <p className="font-display text-2xl text-foreground leading-none">
+              {formatPrice(product.price)}
+            </p>
             <Button
               variant="honey"
               size="sm"
@@ -89,7 +86,7 @@ export function ProductCard({ product }: { product: Product }) {
               disabled={outOfStock}
               aria-label={`Add ${product.name} to cart`}
             >
-              <ShoppingCart />
+              <ShoppingCart className="h-4 w-4" />
               {outOfStock ? "Sold" : "Add"}
             </Button>
           </div>
