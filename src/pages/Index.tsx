@@ -7,6 +7,7 @@ import { FAQSection } from "@/components/home/FAQSection";
 import { ContactCTASection } from "@/components/home/ContactCTASection";
 import { TrustSection } from "@/components/home/TrustSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { ProcessSection } from "@/components/home/ProcessSection";
 import { PromoBanner } from "@/components/home/PromoBanner";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { Link } from "react-router-dom";
@@ -49,6 +50,8 @@ export default function Index() {
         </section>
 
         <HealthBenefitsSection />
+
+        <ProcessSection />
 
         <TestimonialsSection />
 

@@ -60,6 +60,9 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/shipping" element={<Shipping />} />
+            <Route path="/returns" element={<Returns />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
@@ -82,6 +85,8 @@ const App = () => (
               <Route path="users" element={<UsersTab />} />
               <Route path="security" element={<SecurityPage />} />
               <Route path="settings" element={<SettingsTab />} />
+              <Route path="testimonials" element={<TestimonialsTab />} />
+              <Route path="faqs" element={<FaqsTab />} />
             </Route>
 
             {/* Moderator (restricted) */}

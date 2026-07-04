@@ -47,6 +47,8 @@ const ADMIN_NAV = [
     items: [
       { to: "/admin/media", label: "Media Library", icon: ImageIcon },
       { to: "/admin/promos", label: "Promo Banners", icon: Megaphone },
+      { to: "/admin/testimonials", label: "Testimonials", icon: Users },
+      { to: "/admin/faqs", label: "FAQs", icon: FileText },
     ],
   },
   {

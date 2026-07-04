@@ -58,10 +58,11 @@ export function Footer() {
           <div className="lg:col-span-2">
             <h3 className="font-display text-xl text-honey mb-4">Support</h3>
             <ul className="space-y-2.5 text-sm">
+              <li><Link to="/faq" className="text-primary-foreground/80 hover:text-honey transition-colors">FAQs</Link></li>
               <li><Link to="/track-order" className="text-primary-foreground/80 hover:text-honey transition-colors">Track Order</Link></li>
-              <li><Link to="/contact" className="text-primary-foreground/80 hover:text-honey transition-colors">Shipping</Link></li>
-              <li><Link to="/contact" className="text-primary-foreground/80 hover:text-honey transition-colors">Returns</Link></li>
-              <li><Link to="/contact" className="text-primary-foreground/80 hover:text-honey transition-colors">FAQs</Link></li>
+              <li><Link to="/shipping" className="text-primary-foreground/80 hover:text-honey transition-colors">Shipping & Delivery</Link></li>
+              <li><Link to="/returns" className="text-primary-foreground/80 hover:text-honey transition-colors">Returns & Refunds</Link></li>
+              <li><Link to="/contact" className="text-primary-foreground/80 hover:text-honey transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
