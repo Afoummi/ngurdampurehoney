@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      faqs: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string
+          id: string
+          is_published: boolean
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           email: string
@@ -151,6 +184,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          low_stock_threshold: number
           name: string
           price: number
           size: string | null
@@ -164,6 +198,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          low_stock_threshold?: number
           name: string
           price?: number
           size?: string | null
@@ -177,6 +212,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          low_stock_threshold?: number
           name?: string
           price?: number
           size?: string | null
@@ -295,6 +331,66 @@ export type Database = {
           storage_path?: string | null
           subtitle?: string | null
           title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          author_location: string | null
+          author_name: string
+          avatar_url: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          quote: string
+          rating: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          author_location?: string | null
+          author_name: string
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          quote: string
+          rating?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          author_location?: string | null
+          author_name?: string
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          quote?: string
+          rating?: number
+          sort_order?: number
           updated_at?: string
         }
         Relationships: []
