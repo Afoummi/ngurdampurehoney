@@ -5,21 +5,25 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mail, Phone, MapPin, MessageCircle, Send, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, MessageCircle, Send, Clock, Facebook, Instagram, Twitter } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { BRAND } from "@/lib/brand";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export default function Contact() {
+  const { business, social } = useSiteSettings();
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const subject = encodeURIComponent(formData.subject || "Enquiry from Ngurdam Honey website");
     const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`);
-    window.location.href = `mailto:${BRAND.email}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${business.email}?subject=${subject}&body=${body}`;
     toast.success("Opening your email app...");
   };
+
+  const waNumber = business.whatsapp.replace(/[^\d]/g, "");
+  const waUrl = `https://wa.me/${waNumber}`;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -32,9 +36,20 @@ export default function Contact() {
               We'd love to <span className="italic text-honey-deep">hear from you</span>
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Have questions about our honey, bulk orders, or partnerships? Reach out below or
-              chat with us directly on WhatsApp.
+              Questions, bulk orders, or partnerships — reach out below or chat with us on WhatsApp.
             </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button asChild variant="honey" size="lg">
+                <a href={waUrl} target="_blank" rel="noopener noreferrer">
+                  <MessageCircle className="w-4 h-4" /> WhatsApp us
+                </a>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <a href={`tel:${business.phones[0]}`}>
+                  <Phone className="w-4 h-4" /> Call {business.phones[0]}
+                </a>
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -81,29 +96,80 @@ export default function Contact() {
                 </p>
 
                 <ContactCard icon={MessageCircle} label="WhatsApp" highlight>
-                  <a href={`https://wa.me/${BRAND.whatsappNumber}`} target="_blank" rel="noopener noreferrer"
+                  <a href={waUrl} target="_blank" rel="noopener noreferrer"
                     className="text-honey-deep font-medium hover:underline">
                     Chat with us →
                   </a>
                 </ContactCard>
 
                 <ContactCard icon={Phone} label="Phone">
-                  <a href={`tel:${BRAND.phones[0]}`} className="block hover:text-honey-deep">{BRAND.phones[0]}</a>
-                  <a href={`tel:${BRAND.phones[1]}`} className="block hover:text-honey-deep">{BRAND.phones[1]}</a>
+                  {business.phones.map((p, i) => (
+                    <a key={i} href={`tel:${p}`} className="block hover:text-honey-deep">{p}</a>
+                  ))}
                 </ContactCard>
 
                 <ContactCard icon={Mail} label="Email">
-                  <a href={`mailto:${BRAND.email}`} className="hover:text-honey-deep break-all">{BRAND.email}</a>
+                  <a href={`mailto:${business.email}`} className="hover:text-honey-deep break-all">{business.email}</a>
                 </ContactCard>
 
                 <ContactCard icon={MapPin} label="Office">
-                  {BRAND.address.line1},<br />{BRAND.address.line2},<br />{BRAND.address.line3}.
+                  {business.address_line1},<br />{business.address_line2},<br />{business.address_line3}.
                 </ContactCard>
 
-                <ContactCard icon={Clock} label="Hours">
-                  Mon – Sat<br />9:00 AM – 6:00 PM WAT
+                <ContactCard icon={Clock} label="Business Hours">
+                  {business.hours.map((h, i) => (
+                    <div key={i} className="flex justify-between gap-4">
+                      <span className="text-muted-foreground">{h.day}</span>
+                      <span className="font-medium">{h.hours}</span>
+                    </div>
+                  ))}
                 </ContactCard>
+
+                <div className="flex gap-3 pt-2">
+                  {social.facebook && social.facebook !== "#" && (
+                    <SocialIcon href={social.facebook} label="Facebook"><Facebook className="w-4 h-4" /></SocialIcon>
+                  )}
+                  {social.instagram && social.instagram !== "#" && (
+                    <SocialIcon href={social.instagram} label="Instagram"><Instagram className="w-4 h-4" /></SocialIcon>
+                  )}
+                  {social.twitter && social.twitter !== "#" && (
+                    <SocialIcon href={social.twitter} label="X"><Twitter className="w-4 h-4" /></SocialIcon>
+                  )}
+                  {social.tiktok && social.tiktok !== "#" && (
+                    <SocialIcon href={social.tiktok} label="TikTok">
+                      <TikTokIcon />
+                    </SocialIcon>
+                  )}
+                </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-16 md:pb-24">
+          <div className="container">
+            <div className="rounded-3xl overflow-hidden border border-border/60 shadow-card bg-muted/30 aspect-[16/7]">
+              {business.map_embed_url ? (
+                <iframe
+                  src={business.map_embed_url}
+                  title="Ngurdam Honey location"
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-center p-8">
+                  <MapPin className="w-10 h-10 text-honey-deep mb-3" />
+                  <p className="font-display text-xl mb-1">Find us in Sokoto</p>
+                  <p className="text-muted-foreground text-sm max-w-md">
+                    {business.address_line1}, {business.address_line2}, {business.address_line3}.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    (Map coming soon — admins can paste a Google Maps embed URL in Site Settings.)
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -120,11 +186,28 @@ function ContactCard({ icon: Icon, label, children, highlight }: { icon: React.C
         <div className="w-10 h-10 rounded-xl bg-honey-cream flex items-center justify-center flex-shrink-0">
           <Icon className="w-5 h-5 text-honey-deep" />
         </div>
-        <div className="text-sm leading-relaxed">
+        <div className="text-sm leading-relaxed flex-1 min-w-0">
           <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground mb-1">{label}</p>
           <div className="text-foreground">{children}</div>
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function SocialIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+      className="w-10 h-10 rounded-full border border-border/60 bg-card flex items-center justify-center text-foreground/70 hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
+      {children}
+    </a>
+  );
+}
+
+function TikTokIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.7 20.1a6.34 6.34 0 0 0 10.86-4.43V8.55a8.16 8.16 0 0 0 4.77 1.52V6.63a4.85 4.85 0 0 1-1.74-.05Z"/>
+    </svg>
   );
 }
