@@ -12,6 +12,9 @@ import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import FAQ from "./pages/FAQ";
+import Shipping from "./pages/Shipping";
+import Returns from "./pages/Returns";
 import Auth from "./pages/Auth";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -34,6 +37,8 @@ import { PromoTab } from "./components/admin/PromoTab";
 import { UsersTab } from "./components/admin/UsersTab";
 import { SettingsTab } from "./components/admin/SettingsTab";
 import { MediaTab } from "./components/admin/MediaTab";
+import { TestimonialsTab } from "./components/admin/TestimonialsTab";
+import { FaqsTab } from "./components/admin/FaqsTab";
 
 
 const queryClient = new QueryClient();
