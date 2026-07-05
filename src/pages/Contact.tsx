@@ -9,6 +9,7 @@ import { Mail, Phone, MapPin, MessageCircle, Send, Clock, Facebook, Instagram, T
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { SEO } from "@/components/seo/SEO";
 
 export default function Contact() {
   const { business, social } = useSiteSettings();
@@ -27,6 +28,11 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Contact Ngurdam Honey — WhatsApp, Phone & Email"
+        description="Get in touch with AB Sardauna Ngurdam Ventures. Order on WhatsApp, call, or email us for enquiries about our pure Nigerian honey."
+        path="/contact"
+      />
       <Navbar />
       <main className="flex-1">
         <section className="bg-honey-cream/40 py-16 md:py-24">

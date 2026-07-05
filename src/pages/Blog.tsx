@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, ArrowRight } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter/NewsletterForm";
 import { useSiteMedia } from "@/hooks/useSiteMedia";
+import { SEO } from "@/components/seo/SEO";
 import wellness from "@/assets/photos/wellness.jpg";
 import drip from "@/assets/photos/drip.jpg";
 import beekeeper from "@/assets/photos/beekeeper.jpg";
@@ -45,6 +46,11 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Journal — Ngurdam Honey Stories, Health & Recipes"
+        description="Stories from the apiary — health benefits of raw honey, recipes, beekeeper interviews, and honey care tips from Ngurdam."
+        path="/blog"
+      />
       <Navbar />
       <main className="flex-1">
         {/* Header */}

@@ -10,6 +10,8 @@ import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { ProcessSection } from "@/components/home/ProcessSection";
 import { PromoBanner } from "@/components/home/PromoBanner";
 import { ProductGrid } from "@/components/products/ProductGrid";
+import { RecentlyViewed } from "@/components/products/RecentlyViewed";
+import { SEO, ORG_JSONLD } from "@/components/seo/SEO";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -17,6 +19,17 @@ import { ArrowRight } from "lucide-react";
 export default function Index() {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Ngurdam Honey — Pure Raw Nigerian Honey from Gembu, Taraba"
+        description="100% pure, raw honey harvested by hand from the highlands of Gembu, Taraba State. NAFDAC registered. Delivered nationwide."
+        path="/"
+        jsonLd={[ORG_JSONLD, {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Ngurdam Honey",
+          url: "https://ngurdamhoney.lovable.app",
+        }]}
+      />
       <PromoBanner />
       <Navbar />
       <main className="flex-1" id="main">
@@ -56,6 +69,8 @@ export default function Index() {
         <TestimonialsSection />
 
         <FAQSection />
+
+        <RecentlyViewed limit={4} />
 
         <ContactCTASection />
       </main>

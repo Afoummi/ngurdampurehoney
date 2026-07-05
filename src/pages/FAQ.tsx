@@ -5,6 +5,7 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
+import { SEO } from "@/components/seo/SEO";
 import { Loader2 } from "lucide-react";
 
 interface Faq {
@@ -48,8 +49,24 @@ export default function FAQ() {
     return order.indexOf(a) - order.indexOf(b);
   });
 
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  } : undefined;
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="FAQ — Ngurdam Pure Honey"
+        description="Answers to common questions about Ngurdam Honey — purity, sourcing, storage, delivery and returns."
+        path="/faq"
+        jsonLd={faqJsonLd}
+      />
       <Navbar />
       <main className="flex-1">
         <section className="bg-honey-cream/40 py-16 md:py-24">

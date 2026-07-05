@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Product, fetchProductById, fetchProducts, formatPrice } from "@/lib/products";
-import { ProductGrid } from "@/components/products/ProductGrid";
+import { ProductCard } from "@/components/products/ProductCard";
+import { RecentlyViewed } from "@/components/products/RecentlyViewed";
+import { trackRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { SEO } from "@/components/seo/SEO";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,8 +31,14 @@ export default function ProductDetail() {
       try {
         const data = await fetchProductById(handle);
         setProduct(data);
-        const all = await fetchProducts(8);
-        setRelated(all.filter((p) => p.id !== handle).slice(0, 4));
+        if (data) trackRecentlyViewed(data.id);
+        const all = await fetchProducts(12);
+        const sameCategory = data?.category
+          ? all.filter((p) => p.id !== handle && p.category === data.category)
+          : [];
+        const others = all.filter((p) => p.id !== handle);
+        const picks = (sameCategory.length > 0 ? sameCategory : others).slice(0, 4);
+        setRelated(picks);
       } catch (err) {
         console.error(err);
       } finally {
@@ -203,12 +212,40 @@ export default function ProductDetail() {
                 </h2>
                 <Button asChild variant="ghost"><Link to="/products">View all →</Link></Button>
               </div>
-              <ProductGrid limit={4} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {related.map((p) => <ProductCard key={p.id} product={p} />)}
+              </div>
             </section>
           )}
         </div>
+
+        <RecentlyViewed excludeId={product.id} />
       </main>
       <Footer />
+      <SEO
+        title={`${product.name}${product.size ? ` (${product.size})` : ""} — Ngurdam Pure Honey`}
+        description={product.description || `Buy ${product.name} — raw unfiltered Nigerian honey from Ngurdam.`}
+        path={`/product/${product.id}`}
+        image={product.image_url || undefined}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description || undefined,
+          image: product.image_url || undefined,
+          brand: { "@type": "Brand", name: "Ngurdam Pure Honey" },
+          offers: {
+            "@type": "Offer",
+            price: product.price,
+            priceCurrency: "NGN",
+            availability: product.stock > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+            url: `https://ngurdamhoney.lovable.app/product/${product.id}`,
+          },
+        }}
+      />
     </div>
   );
 }

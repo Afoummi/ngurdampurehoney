@@ -5,10 +5,16 @@ import { Heart, Users, Target, Award, MapPin } from "lucide-react";
 import beekeeper from "@/assets/photos/beekeeper.jpg";
 import honeycomb from "@/assets/photos/honeycomb.jpg";
 import { BRAND } from "@/lib/brand";
+import { SEO } from "@/components/seo/SEO";
 
 export default function About() {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Our Story — Ngurdam Pure Honey from Gembu, Taraba"
+        description="How AB Sardauna Ngurdam Ventures hand-harvests raw honey from the Gembu highlands and bottles it in Sokoto for families across Nigeria."
+        path="/about"
+      />
       <Navbar />
       <main className="flex-1">
         <section className="py-16 md:py-24">
