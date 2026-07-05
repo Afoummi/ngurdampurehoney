@@ -4,7 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Users } from "lucide-react";
+import { Loader2, Users, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toCSV, downloadCSV } from "@/lib/csv";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -124,9 +126,27 @@ export function CustomersTab({ canManageRoles = false }: CustomersTabProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Users</CardTitle>
-        <CardDescription>View and manage registered users</CardDescription>
+      <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <CardTitle>Users</CardTitle>
+          <CardDescription>View and manage registered users</CardDescription>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            const rows = customers.map((c) => ({
+              name: c.full_name || "",
+              phone: c.phone || "",
+              address: c.address || "",
+              role: c.role,
+              joined: format(new Date(c.created_at), "yyyy-MM-dd"),
+            }));
+            downloadCSV(`customers-${format(new Date(), "yyyy-MM-dd")}.csv`, toCSV(rows));
+          }}
+        >
+          <Download className="h-4 w-4 mr-1" /> Export CSV
+        </Button>
       </CardHeader>
       <CardContent>
         <Table>
