@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, LogOut, ExternalLink } from "lucide-react";
 import {
@@ -19,6 +20,7 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   LayoutDashboard, ShoppingCart, Package, Boxes, Users, Mail, Megaphone,
@@ -92,6 +94,7 @@ export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
   const { user, isLoading, isAdmin, isModerator, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [lowStockCount, setLowStockCount] = useState(0);
 
   const allowed = variant === "admin" ? isAdmin : isAdmin || isModerator;
   const groups = variant === "admin" ? ADMIN_NAV : MODERATOR_NAV;
@@ -106,6 +109,18 @@ export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
       navigate("/");
     }
   }, [isLoading, user, allowed, navigate, variant]);
+
+  useEffect(() => {
+    if (!allowed) return;
+    let cancelled = false;
+    const load = async () => {
+      const { data } = await supabase.from("products").select("id, stock").lt("stock", 5);
+      if (!cancelled) setLowStockCount(data?.length ?? 0);
+    };
+    load();
+    const id = setInterval(load, 60_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [allowed]);
 
   if (isLoading || !allowed) {
     return (
@@ -154,12 +169,20 @@ export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
                   <SidebarMenu>
                     {group.items.map((item) => {
                       const active = location.pathname === item.to;
+                      const showBadge = item.label === "Inventory" && lowStockCount > 0;
                       return (
                         <SidebarMenuItem key={item.to}>
                           <SidebarMenuButton asChild isActive={active} tooltip={item.label}>
-                            <Link to={item.to}>
-                              <item.icon className="h-4 w-4" />
-                              <span>{item.label}</span>
+                            <Link to={item.to} className="justify-between">
+                              <span className="flex items-center gap-2">
+                                <item.icon className="h-4 w-4" />
+                                <span>{item.label}</span>
+                              </span>
+                              {showBadge && (
+                                <Badge className="ml-auto h-5 min-w-5 px-1.5 bg-destructive text-destructive-foreground text-[10px]">
+                                  {lowStockCount}
+                                </Badge>
+                              )}
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
