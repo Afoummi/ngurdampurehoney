@@ -70,6 +70,8 @@ export default function Index() {
 
         <FAQSection />
 
+        <RecentlyViewed limit={4} />
+
         <ContactCTASection />
       </main>
       <Footer />
