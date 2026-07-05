@@ -11,10 +11,11 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Eye, Package, Printer, Archive, ArchiveRestore, Trash2 } from "lucide-react";
+import { Loader2, Eye, Package, Printer, Archive, ArchiveRestore, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
+import { toCSV, downloadCSV } from "@/lib/csv";
 
 interface Order {
   id: string;
@@ -294,17 +295,44 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
       </div>
 
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-4">
+      <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <CardTitle>Orders</CardTitle>
           <CardDescription>Manage customer orders and track deliveries</CardDescription>
         </div>
-        <Tabs value={view} onValueChange={(v) => setView(v as "active" | "archived")}>
-          <TabsList>
-            <TabsTrigger value="active">Active ({activeOrders.length})</TabsTrigger>
-            <TabsTrigger value="archived">Archived ({archivedOrders.length})</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Tabs value={view} onValueChange={(v) => setView(v as "active" | "archived")}>
+            <TabsList>
+              <TabsTrigger value="active">Active ({activeOrders.length})</TabsTrigger>
+              <TabsTrigger value="archived">Archived ({archivedOrders.length})</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={visibleOrders.length === 0}
+            onClick={() => {
+              const rows = visibleOrders.map((o) => ({
+                order_id: o.id,
+                date: format(new Date(o.created_at), "yyyy-MM-dd HH:mm"),
+                customer_name: o.customer_name,
+                customer_email: o.customer_email,
+                customer_phone: o.customer_phone || "",
+                shipping_address: o.shipping_address,
+                items: o.items.map((i: any) => `${i.quantity}× ${i.title || i.name}`).join(" | "),
+                total_amount: o.total_amount,
+                currency: o.currency,
+                status: o.status,
+                payment_status: o.payment_status,
+                notes: o.notes || "",
+              }));
+              downloadCSV(`orders-${view}-${format(new Date(), "yyyy-MM-dd")}.csv`, toCSV(rows));
+              toast.success("Orders exported");
+            }}
+          >
+            <Download className="h-4 w-4 mr-1" /> Export CSV
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {visibleOrders.length === 0 ? (
