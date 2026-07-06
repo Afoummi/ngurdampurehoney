@@ -74,7 +74,8 @@ export function InventoryTab() {
           </TableHeader>
           <TableBody>
             {products.map((p) => {
-              const low = p.stock < 5;
+              const out = p.stock <= 0;
+              const low = !out && p.stock < 5;
               const edit = edits[p.id];
               const changed = edit !== undefined && edit !== p.stock;
               return (
@@ -83,8 +84,17 @@ export function InventoryTab() {
                   <TableCell>{p.size || "—"}</TableCell>
                   <TableCell>{formatPrice(Number(p.price))}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={low ? "bg-destructive/10 text-destructive border-destructive/30" : ""}>
-                      {p.stock} {low && "· LOW"}
+                    <Badge
+                      variant="outline"
+                      className={
+                        out
+                          ? "bg-destructive text-destructive-foreground border-destructive"
+                          : low
+                          ? "bg-warning/15 text-warning-foreground border-warning/40"
+                          : ""
+                      }
+                    >
+                      {p.stock} {out ? "· OUT" : low ? "· LOW" : ""}
                     </Badge>
                   </TableCell>
                   <TableCell>
