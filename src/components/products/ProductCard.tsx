@@ -70,6 +70,11 @@ export function ProductCard({ product }: { product: Product }) {
             <h3 className="font-display text-xl leading-tight text-foreground group-hover:text-honey-deep transition-colors">
               {product.name}
             </h3>
+            {product.container_type && (
+              <p className="text-[10px] uppercase tracking-[0.15em] font-medium text-honey-deep">
+                {product.container_type}
+              </p>
+            )}
             <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
               {product.description || "Hand-harvested raw honey from Ngurdam apiaries."}
             </p>
