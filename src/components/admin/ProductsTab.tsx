@@ -29,6 +29,8 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
 
   const [form, setForm] = useState({
     name: "", description: "", price: "", stock: "", image_url: "", category: "",
+    container_type: "", container_type_custom: "",
+    package_size: "", package_size_custom: "",
   });
 
   useEffect(() => {
