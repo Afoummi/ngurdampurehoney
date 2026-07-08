@@ -332,6 +332,58 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                   placeholder="100" min="0" />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Container Type</Label>
+                <Select
+                  value={form.container_type || "__none__"}
+                  onValueChange={(v) =>
+                    setForm({ ...form, container_type: v === "__none__" ? "" : v })
+                  }
+                >
+                  <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">None</SelectItem>
+                    {CONTAINER_TYPES.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                    <SelectItem value="__custom__">Custom…</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.container_type === "__custom__" && (
+                  <Input
+                    value={form.container_type_custom}
+                    onChange={(e) => setForm({ ...form, container_type_custom: e.target.value })}
+                    placeholder="e.g. Reusable Tin"
+                  />
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label>Package Size</Label>
+                <Select
+                  value={form.package_size || "__none__"}
+                  onValueChange={(v) =>
+                    setForm({ ...form, package_size: v === "__none__" ? "" : v })
+                  }
+                >
+                  <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">None</SelectItem>
+                    {PACKAGE_SIZES.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                    <SelectItem value="__custom__">Custom…</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.package_size === "__custom__" && (
+                  <Input
+                    value={form.package_size_custom}
+                    onChange={(e) => setForm({ ...form, package_size_custom: e.target.value })}
+                    placeholder="e.g. 750 ml"
+                  />
+                )}
+              </div>
+            </div>
             <div className="space-y-2">
               <Label>Product Image</Label>
               <ImageUploader
