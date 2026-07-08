@@ -10,8 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Pencil, Trash2, Package, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { Product, formatPrice } from "@/lib/products";
+import { Product, formatPrice, CONTAINER_TYPES, PACKAGE_SIZES } from "@/lib/products";
 import { ImageUploader } from "./ImageUploader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 interface ProductsTabProps {
@@ -28,6 +29,8 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
 
   const [form, setForm] = useState({
     name: "", description: "", price: "", stock: "", image_url: "", category: "",
+    container_type: "", container_type_custom: "",
+    package_size: "", package_size_custom: "",
   });
 
   useEffect(() => {
@@ -53,12 +56,18 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
 
   const openCreateDialog = () => {
     setEditingProduct(null);
-    setForm({ name: "", description: "", price: "", stock: "", image_url: "", category: "" });
+    setForm({
+      name: "", description: "", price: "", stock: "", image_url: "", category: "",
+      container_type: "", container_type_custom: "",
+      package_size: "", package_size_custom: "",
+    });
     setIsDialogOpen(true);
   };
 
   const openEditDialog = (product: Product) => {
     setEditingProduct(product);
+    const ct = product.container_type || "";
+    const ps = product.package_size || "";
     setForm({
       name: product.name,
       description: product.description || "",
@@ -66,6 +75,10 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
       stock: String(product.stock),
       image_url: product.image_url || "",
       category: product.category || "",
+      container_type: ct && (CONTAINER_TYPES as readonly string[]).includes(ct) ? ct : ct ? "__custom__" : "",
+      container_type_custom: ct && !(CONTAINER_TYPES as readonly string[]).includes(ct) ? ct : "",
+      package_size: ps && (PACKAGE_SIZES as readonly string[]).includes(ps) ? ps : ps ? "__custom__" : "",
+      package_size_custom: ps && !(PACKAGE_SIZES as readonly string[]).includes(ps) ? ps : "",
     });
     setIsDialogOpen(true);
   };
@@ -78,6 +91,15 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
 
     setIsSaving(true);
     try {
+      const containerType =
+        form.container_type === "__custom__"
+          ? form.container_type_custom.trim()
+          : form.container_type.trim();
+      const packageSize =
+        form.package_size === "__custom__"
+          ? form.package_size_custom.trim()
+          : form.package_size.trim();
+
       const productData = {
         name: form.name.trim(),
         description: form.description.trim() || null,
@@ -85,6 +107,8 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
         stock: parseInt(form.stock) || 0,
         image_url: form.image_url.trim() || null,
         category: form.category.trim() || null,
+        container_type: containerType || null,
+        package_size: packageSize || null,
       };
 
       if (editingProduct) {
@@ -192,6 +216,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
+                    <TableHead>Packaging</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Status</TableHead>
@@ -217,6 +242,21 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                               {product.description?.slice(0, 50) || "No description"}
                             </p>
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1 text-xs">
+                          {product.container_type && (
+                            <Badge variant="outline" className="w-fit font-normal">
+                              {product.container_type}
+                            </Badge>
+                          )}
+                          {product.package_size && (
+                            <span className="text-muted-foreground">{product.package_size}</span>
+                          )}
+                          {!product.container_type && !product.package_size && (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="font-medium">{formatPrice(product.price)}</TableCell>
@@ -290,6 +330,58 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                 <Input type="number" value={form.stock}
                   onChange={(e) => setForm({ ...form, stock: e.target.value })}
                   placeholder="100" min="0" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Container Type</Label>
+                <Select
+                  value={form.container_type || "__none__"}
+                  onValueChange={(v) =>
+                    setForm({ ...form, container_type: v === "__none__" ? "" : v })
+                  }
+                >
+                  <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">None</SelectItem>
+                    {CONTAINER_TYPES.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                    <SelectItem value="__custom__">Custom…</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.container_type === "__custom__" && (
+                  <Input
+                    value={form.container_type_custom}
+                    onChange={(e) => setForm({ ...form, container_type_custom: e.target.value })}
+                    placeholder="e.g. Reusable Tin"
+                  />
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label>Package Size</Label>
+                <Select
+                  value={form.package_size || "__none__"}
+                  onValueChange={(v) =>
+                    setForm({ ...form, package_size: v === "__none__" ? "" : v })
+                  }
+                >
+                  <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">None</SelectItem>
+                    {PACKAGE_SIZES.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                    <SelectItem value="__custom__">Custom…</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.package_size === "__custom__" && (
+                  <Input
+                    value={form.package_size_custom}
+                    onChange={(e) => setForm({ ...form, package_size_custom: e.target.value })}
+                    placeholder="e.g. 750 ml"
+                  />
+                )}
               </div>
             </div>
             <div className="space-y-2">

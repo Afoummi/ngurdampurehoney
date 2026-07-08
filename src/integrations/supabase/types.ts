@@ -179,6 +179,7 @@ export type Database = {
       products: {
         Row: {
           category: string | null
+          container_type: string | null
           created_at: string
           description: string | null
           id: string
@@ -186,6 +187,7 @@ export type Database = {
           is_active: boolean
           low_stock_threshold: number
           name: string
+          package_size: string | null
           price: number
           size: string | null
           stock: number
@@ -193,6 +195,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          container_type?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -200,6 +203,7 @@ export type Database = {
           is_active?: boolean
           low_stock_threshold?: number
           name: string
+          package_size?: string | null
           price?: number
           size?: string | null
           stock?: number
@@ -207,6 +211,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          container_type?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -214,6 +219,7 @@ export type Database = {
           is_active?: boolean
           low_stock_threshold?: number
           name?: string
+          package_size?: string | null
           price?: number
           size?: string | null
           stock?: number
