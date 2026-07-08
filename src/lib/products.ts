@@ -7,12 +7,33 @@ export interface Product {
   price: number;
   stock: number;
   size: string | null;
+  package_size: string | null;
+  container_type: string | null;
   image_url: string | null;
   category: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
+
+export const CONTAINER_TYPES = [
+  "Square Handle Bottle",
+  "Classic Round Bottle",
+  "Glass Jar",
+  "Plastic Jar",
+  "Squeeze Bottle",
+  "Gift Pack",
+] as const;
+
+export const PACKAGE_SIZES = [
+  "250 ml",
+  "500 ml",
+  "1 Litre",
+  "2 Litres",
+  "5 Litres",
+  "10 Litres",
+  "20 Litres",
+] as const;
 
 export async function fetchProducts(limit = 12): Promise<Product[]> {
   const { data, error } = await supabase
