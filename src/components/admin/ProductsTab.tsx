@@ -216,6 +216,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
+                    <TableHead>Packaging</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Status</TableHead>
@@ -241,6 +242,21 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                               {product.description?.slice(0, 50) || "No description"}
                             </p>
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1 text-xs">
+                          {product.container_type && (
+                            <Badge variant="outline" className="w-fit font-normal">
+                              {product.container_type}
+                            </Badge>
+                          )}
+                          {product.package_size && (
+                            <span className="text-muted-foreground">{product.package_size}</span>
+                          )}
+                          {!product.container_type && !product.package_size && (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="font-medium">{formatPrice(product.price)}</TableCell>
