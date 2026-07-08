@@ -44,10 +44,10 @@ export function ProductCard({ product }: { product: Product }) {
           />
 
           {/* Size pill */}
-          {product.size && (
+          {(product.package_size || product.size) && (
             <div className="absolute top-4 left-4 bg-background/95 backdrop-blur px-3 py-1 rounded-full shadow-card">
               <p className="text-[10px] uppercase tracking-[0.15em] font-semibold text-foreground">
-                {product.size}
+                {product.package_size || product.size}
               </p>
             </div>
           )}
