@@ -10,8 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Pencil, Trash2, Package, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { Product, formatPrice } from "@/lib/products";
+import { Product, formatPrice, CONTAINER_TYPES, PACKAGE_SIZES } from "@/lib/products";
 import { ImageUploader } from "./ImageUploader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 interface ProductsTabProps {
