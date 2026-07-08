@@ -115,16 +115,25 @@ export default function ProductDetail() {
 
             <div className="space-y-6">
               <div className="space-y-3">
-                {product.size && (
+                {(product.package_size || product.size) && (
                   <p className="text-xs uppercase tracking-[0.2em] text-honey-deep font-medium">
-                    {product.size}
+                    {product.package_size || product.size}
                   </p>
                 )}
                 <h1 className="font-display text-4xl md:text-5xl leading-tight">{product.name}</h1>
                 <p className="font-display text-4xl text-honey-deep">{formatPrice(product.price)}</p>
               </div>
 
-              {product.category && <Badge variant="secondary">{product.category}</Badge>}
+              {product.container_type && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className="border-honey/40 text-honey-deep bg-honey-cream">
+                    {product.container_type}
+                  </Badge>
+                  {product.package_size && (
+                    <Badge variant="secondary">{product.package_size}</Badge>
+                  )}
+                </div>
+              )}
 
               <p className="text-muted-foreground leading-relaxed text-lg">
                 {product.description || "Raw, unfiltered honey from Ngurdam apiaries — golden, fragrant, and full of natural goodness."}
