@@ -56,12 +56,18 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
 
   const openCreateDialog = () => {
     setEditingProduct(null);
-    setForm({ name: "", description: "", price: "", stock: "", image_url: "", category: "" });
+    setForm({
+      name: "", description: "", price: "", stock: "", image_url: "", category: "",
+      container_type: "", container_type_custom: "",
+      package_size: "", package_size_custom: "",
+    });
     setIsDialogOpen(true);
   };
 
   const openEditDialog = (product: Product) => {
     setEditingProduct(product);
+    const ct = product.container_type || "";
+    const ps = product.package_size || "";
     setForm({
       name: product.name,
       description: product.description || "",
@@ -69,6 +75,10 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
       stock: String(product.stock),
       image_url: product.image_url || "",
       category: product.category || "",
+      container_type: ct && (CONTAINER_TYPES as readonly string[]).includes(ct) ? ct : ct ? "__custom__" : "",
+      container_type_custom: ct && !(CONTAINER_TYPES as readonly string[]).includes(ct) ? ct : "",
+      package_size: ps && (PACKAGE_SIZES as readonly string[]).includes(ps) ? ps : ps ? "__custom__" : "",
+      package_size_custom: ps && !(PACKAGE_SIZES as readonly string[]).includes(ps) ? ps : "",
     });
     setIsDialogOpen(true);
   };
@@ -81,6 +91,15 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
 
     setIsSaving(true);
     try {
+      const containerType =
+        form.container_type === "__custom__"
+          ? form.container_type_custom.trim()
+          : form.container_type.trim();
+      const packageSize =
+        form.package_size === "__custom__"
+          ? form.package_size_custom.trim()
+          : form.package_size.trim();
+
       const productData = {
         name: form.name.trim(),
         description: form.description.trim() || null,
@@ -88,6 +107,8 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
         stock: parseInt(form.stock) || 0,
         image_url: form.image_url.trim() || null,
         category: form.category.trim() || null,
+        container_type: containerType || null,
+        package_size: packageSize || null,
       };
 
       if (editingProduct) {
