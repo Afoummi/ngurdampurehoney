@@ -117,7 +117,8 @@ export default function OrderConfirmation() {
 
   const openWhatsApp = () => {
     const message = encodeURIComponent(`Hi! I'd like to check on my order: ${orderId}`);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
+    const num = (business.whatsapp || "").replace(/[^\d]/g, "");
+    window.open(`https://wa.me/${num}?text=${message}`, "_blank");
   };
 
   if (isLoading) {
