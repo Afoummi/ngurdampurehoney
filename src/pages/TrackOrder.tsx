@@ -58,7 +58,7 @@ const paymentStatusColors: Record<string, string> = {
   refunded: "bg-gray-500/10 text-gray-600 border-gray-500/20",
 };
 
-const WHATSAPP_NUMBER = "2348027798163";
+
 
 export default function TrackOrder() {
   const navigate = useNavigate();
