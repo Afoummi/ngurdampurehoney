@@ -45,7 +45,7 @@ const statusConfig: Record<string, { label: string; color: string; description: 
   cancelled: { label: "Cancelled", color: "bg-red-500/10 text-red-600 border-red-500/20", description: "Order was cancelled" },
 };
 
-const WHATSAPP_NUMBER = "2348027798163";
+
 
 export default function OrderConfirmation() {
   const navigate = useNavigate();
