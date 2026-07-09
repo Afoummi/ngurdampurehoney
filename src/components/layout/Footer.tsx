@@ -116,8 +116,8 @@ export function Footer() {
         {/* Legal */}
         <div className="border-t border-primary-foreground/10 mt-12 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-primary-foreground/60">
           <p>
-            &copy; {new Date().getFullYear()} {BRAND.legalName}. All rights reserved.
-            <span className="block md:inline md:ml-2 text-honey/80">NAFDAC Reg. No. {BRAND.nafdacNumber}</span>
+            &copy; {new Date().getFullYear()} {business.legal_name}. All rights reserved.
+            <span className="block md:inline md:ml-2 text-honey/80">NAFDAC Reg. No. {business.nafdac_number}</span>
           </p>
           <div className="flex gap-5">
             <Link to="/privacy" className="hover:text-honey">Privacy Policy</Link>
