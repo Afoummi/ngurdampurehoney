@@ -56,6 +56,7 @@ export default function OrderConfirmation() {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const { business } = useSiteSettings();
 
   useEffect(() => {
     if (!orderId) {
