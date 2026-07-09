@@ -72,6 +72,7 @@ export default function TrackOrder() {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const { business } = useSiteSettings();
 
   // Auto-search if orderId is in URL
   useEffect(() => {
