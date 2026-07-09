@@ -89,22 +89,25 @@ export function Footer() {
                 <MapPin className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
                 <span>
                   <span className="block text-honey/90 text-xs uppercase tracking-wider mb-0.5">Packaging & Office</span>
-                  {BRAND.address.line1},<br />
-                  {BRAND.address.line2},<br />
-                  {BRAND.address.line3}.
+                  {business.address_line1},<br />
+                  {business.address_line2},<br />
+                  {business.address_line3}.
                 </span>
               </li>
               <li className="flex items-start gap-3 text-primary-foreground/85">
                 <Phone className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
                 <span>
-                  <a href={`tel:${BRAND.phones[0]}`} className="hover:text-honey">{BRAND.phones[0]}</a>
-                  <br />
-                  <a href={`tel:${BRAND.phones[1]}`} className="hover:text-honey">{BRAND.phones[1]}</a>
+                  {business.phones.map((p, i) => (
+                    <span key={i}>
+                      <a href={`tel:${p}`} className="hover:text-honey">{p}</a>
+                      {i < business.phones.length - 1 && <br />}
+                    </span>
+                  ))}
                 </span>
               </li>
               <li className="flex items-center gap-3 text-primary-foreground/85">
                 <Mail className="w-4 h-4 text-honey flex-shrink-0" />
-                <a href={`mailto:${BRAND.email}`} className="hover:text-honey break-all">{BRAND.email}</a>
+                <a href={`mailto:${business.email}`} className="hover:text-honey break-all">{business.email}</a>
               </li>
             </ul>
           </div>
