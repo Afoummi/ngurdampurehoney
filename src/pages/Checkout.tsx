@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Loader2, ShoppingBag, ArrowLeft, ShieldCheck, MessageCircle, MapPin } from "lucide-react";
 import { z } from "zod";
 import { BRAND } from "@/lib/brand";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 const checkoutSchema = z.object({
