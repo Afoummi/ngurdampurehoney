@@ -1,8 +1,10 @@
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
-import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function ContactCTASection() {
+  const { business } = useSiteSettings();
+  const waNumber = (business.whatsapp || "").replace(/[^\d]/g, "");
   return (
     <section className="py-20 md:py-28">
       <div className="container">
@@ -22,7 +24,7 @@ export function ContactCTASection() {
                 variant="honey"
                 size="lg"
               >
-                <a href={`https://wa.me/${BRAND.whatsappNumber}`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="mr-1" /> Chat on WhatsApp
                 </a>
               </Button>
@@ -30,17 +32,17 @@ export function ContactCTASection() {
 
             <ul className="space-y-5 text-primary-foreground">
               <ContactRow icon={MapPin} label="Visit Us">
-                {BRAND.address.line1}<br />
-                {BRAND.address.line2}<br />
-                {BRAND.address.line3}.
+                {business.address_line1}<br />
+                {business.address_line2}<br />
+                {business.address_line3}.
               </ContactRow>
               <ContactRow icon={Phone} label="Call Us">
-                <a href={`tel:${BRAND.phones[0]}`} className="hover:text-honey">{BRAND.phones[0]}</a>
-                <br />
-                <a href={`tel:${BRAND.phones[1]}`} className="hover:text-honey">{BRAND.phones[1]}</a>
+                {business.phones.map((p, i) => (
+                  <div key={i}><a href={`tel:${p}`} className="hover:text-honey">{p}</a></div>
+                ))}
               </ContactRow>
               <ContactRow icon={Mail} label="Email Us">
-                <a href={`mailto:${BRAND.email}`} className="hover:text-honey break-all">{BRAND.email}</a>
+                <a href={`mailto:${business.email}`} className="hover:text-honey break-all">{business.email}</a>
               </ContactRow>
             </ul>
           </div>
@@ -49,6 +51,7 @@ export function ContactCTASection() {
     </section>
   );
 }
+
 
 function ContactRow({ icon: Icon, label, children }: { icon: React.ComponentType<{ className?: string }>; label: string; children: React.ReactNode }) {
   return (

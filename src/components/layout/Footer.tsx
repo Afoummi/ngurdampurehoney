@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter/NewsletterForm";
-import { BRAND } from "@/lib/brand";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function Footer() {
+  const { business, social, footer } = useSiteSettings();
   return (
     <footer className="bg-forest-gradient text-primary-foreground mt-auto">
       <div className="container py-16 md:py-20">
@@ -11,11 +12,11 @@ export function Footer() {
           {/* Brand block */}
           <div className="lg:col-span-4 space-y-5">
             <div>
-              <p className="font-display text-3xl text-honey">{BRAND.productName}</p>
-              <p className="text-xs uppercase tracking-[0.2em] text-honey/70 mt-1">{BRAND.legalName}</p>
+              <p className="font-display text-3xl text-honey">{business.product_name}</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-honey/70 mt-1">{business.legal_name}</p>
             </div>
             <p className="text-sm text-primary-foreground/75 leading-relaxed max-w-sm">
-              Premium 100% pure, unprocessed honey from Nigerian apiaries. {BRAND.tagline}
+              {footer.about}
             </p>
 
             <div>
@@ -27,21 +28,28 @@ export function Footer() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <a href={BRAND.social.facebook} target="_blank" rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a href={BRAND.social.instagram} aria-label="Instagram"
-                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a href={BRAND.social.twitter} aria-label="Twitter / X"
-                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
-                <Twitter className="w-4 h-4" />
-              </a>
+              {social.facebook && social.facebook !== "#" && (
+                <a href={social.facebook} target="_blank" rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
+                  <Facebook className="w-4 h-4" />
+                </a>
+              )}
+              {social.instagram && social.instagram !== "#" && (
+                <a href={social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+                  className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+              {social.twitter && social.twitter !== "#" && (
+                <a href={social.twitter} target="_blank" rel="noopener noreferrer" aria-label="Twitter / X"
+                  className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
+                  <Twitter className="w-4 h-4" />
+                </a>
+              )}
             </div>
           </div>
+
 
           {/* Quick Links */}
           <div className="lg:col-span-2">
@@ -81,22 +89,25 @@ export function Footer() {
                 <MapPin className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
                 <span>
                   <span className="block text-honey/90 text-xs uppercase tracking-wider mb-0.5">Packaging & Office</span>
-                  {BRAND.address.line1},<br />
-                  {BRAND.address.line2},<br />
-                  {BRAND.address.line3}.
+                  {business.address_line1},<br />
+                  {business.address_line2},<br />
+                  {business.address_line3}.
                 </span>
               </li>
               <li className="flex items-start gap-3 text-primary-foreground/85">
                 <Phone className="w-4 h-4 mt-0.5 text-honey flex-shrink-0" />
                 <span>
-                  <a href={`tel:${BRAND.phones[0]}`} className="hover:text-honey">{BRAND.phones[0]}</a>
-                  <br />
-                  <a href={`tel:${BRAND.phones[1]}`} className="hover:text-honey">{BRAND.phones[1]}</a>
+                  {business.phones.map((p, i) => (
+                    <span key={i}>
+                      <a href={`tel:${p}`} className="hover:text-honey">{p}</a>
+                      {i < business.phones.length - 1 && <br />}
+                    </span>
+                  ))}
                 </span>
               </li>
               <li className="flex items-center gap-3 text-primary-foreground/85">
                 <Mail className="w-4 h-4 text-honey flex-shrink-0" />
-                <a href={`mailto:${BRAND.email}`} className="hover:text-honey break-all">{BRAND.email}</a>
+                <a href={`mailto:${business.email}`} className="hover:text-honey break-all">{business.email}</a>
               </li>
             </ul>
           </div>
@@ -105,8 +116,8 @@ export function Footer() {
         {/* Legal */}
         <div className="border-t border-primary-foreground/10 mt-12 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-primary-foreground/60">
           <p>
-            &copy; {new Date().getFullYear()} {BRAND.legalName}. All rights reserved.
-            <span className="block md:inline md:ml-2 text-honey/80">NAFDAC Reg. No. {BRAND.nafdacNumber}</span>
+            &copy; {new Date().getFullYear()} {business.legal_name}. All rights reserved.
+            <span className="block md:inline md:ml-2 text-honey/80">NAFDAC Reg. No. {business.nafdac_number}</span>
           </p>
           <div className="flex gap-5">
             <Link to="/privacy" className="hover:text-honey">Privacy Policy</Link>

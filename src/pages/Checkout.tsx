@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Loader2, ShoppingBag, ArrowLeft, ShieldCheck, MessageCircle, MapPin } from "lucide-react";
 import { z } from "zod";
 import { BRAND } from "@/lib/brand";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 const checkoutSchema = z.object({
@@ -36,6 +37,7 @@ export default function Checkout() {
   const { items, clearCart } = useCartStore();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const { business } = useSiteSettings();
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
 
   const [formData, setFormData] = useState<CheckoutFormData>({
@@ -155,7 +157,8 @@ export default function Checkout() {
       const order = await createOrder();
 
       const message = encodeURIComponent(buildWhatsAppMessage(order.id));
-      const waUrl = `https://wa.me/${BRAND.whatsappNumber}?text=${message}`;
+      const waNumber = (business.whatsapp || BRAND.whatsappNumber).replace(/[^\d]/g, "");
+      const waUrl = `https://wa.me/${waNumber}?text=${message}`;
 
       // Open WhatsApp in a new tab BEFORE async work to keep the user gesture
       const win = window.open(waUrl, "_blank");

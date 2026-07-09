@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle2, Package, MessageCircle, Home, Loader2, Copy, Check } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 interface OrderItem {
   productTitle: string;
@@ -44,7 +45,7 @@ const statusConfig: Record<string, { label: string; color: string; description: 
   cancelled: { label: "Cancelled", color: "bg-red-500/10 text-red-600 border-red-500/20", description: "Order was cancelled" },
 };
 
-const WHATSAPP_NUMBER = "2348027798163";
+
 
 export default function OrderConfirmation() {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ export default function OrderConfirmation() {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const { business } = useSiteSettings();
 
   useEffect(() => {
     if (!orderId) {
@@ -115,7 +117,8 @@ export default function OrderConfirmation() {
 
   const openWhatsApp = () => {
     const message = encodeURIComponent(`Hi! I'd like to check on my order: ${orderId}`);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
+    const num = (business.whatsapp || "").replace(/[^\d]/g, "");
+    window.open(`https://wa.me/${num}?text=${message}`, "_blank");
   };
 
   if (isLoading) {

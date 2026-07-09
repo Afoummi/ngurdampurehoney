@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Package, Search, Loader2, ArrowLeft, MessageCircle, CheckCircle2, Clock, Truck, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 interface OrderItem {
   productTitle: string;
@@ -58,7 +59,7 @@ const paymentStatusColors: Record<string, string> = {
   refunded: "bg-gray-500/10 text-gray-600 border-gray-500/20",
 };
 
-const WHATSAPP_NUMBER = "2348027798163";
+
 
 export default function TrackOrder() {
   const navigate = useNavigate();
@@ -71,6 +72,7 @@ export default function TrackOrder() {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const { business } = useSiteSettings();
 
   // Auto-search if orderId is in URL
   useEffect(() => {
@@ -152,7 +154,8 @@ export default function TrackOrder() {
 
   const openWhatsApp = () => {
     const message = encodeURIComponent(`Hi! I'd like to check on my order: ${order?.id}`);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
+    const num = (business.whatsapp || "").replace(/[^\d]/g, "");
+    window.open(`https://wa.me/${num}?text=${message}`, "_blank");
   };
 
   return (
