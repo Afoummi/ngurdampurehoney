@@ -12,11 +12,11 @@ export function Footer() {
           {/* Brand block */}
           <div className="lg:col-span-4 space-y-5">
             <div>
-              <p className="font-display text-3xl text-honey">{BRAND.productName}</p>
-              <p className="text-xs uppercase tracking-[0.2em] text-honey/70 mt-1">{BRAND.legalName}</p>
+              <p className="font-display text-3xl text-honey">{business.product_name}</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-honey/70 mt-1">{business.legal_name}</p>
             </div>
             <p className="text-sm text-primary-foreground/75 leading-relaxed max-w-sm">
-              Premium 100% pure, unprocessed honey from Nigerian apiaries. {BRAND.tagline}
+              {footer.about}
             </p>
 
             <div>
@@ -28,21 +28,28 @@ export function Footer() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <a href={BRAND.social.facebook} target="_blank" rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a href={BRAND.social.instagram} aria-label="Instagram"
-                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a href={BRAND.social.twitter} aria-label="Twitter / X"
-                className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
-                <Twitter className="w-4 h-4" />
-              </a>
+              {social.facebook && social.facebook !== "#" && (
+                <a href={social.facebook} target="_blank" rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
+                  <Facebook className="w-4 h-4" />
+                </a>
+              )}
+              {social.instagram && social.instagram !== "#" && (
+                <a href={social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+                  className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+              {social.twitter && social.twitter !== "#" && (
+                <a href={social.twitter} target="_blank" rel="noopener noreferrer" aria-label="Twitter / X"
+                  className="w-9 h-9 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-honey hover:border-honey hover:text-honey-foreground transition-colors">
+                  <Twitter className="w-4 h-4" />
+                </a>
+              )}
             </div>
           </div>
+
 
           {/* Quick Links */}
           <div className="lg:col-span-2">
