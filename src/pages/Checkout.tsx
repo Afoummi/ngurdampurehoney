@@ -157,7 +157,8 @@ export default function Checkout() {
       const order = await createOrder();
 
       const message = encodeURIComponent(buildWhatsAppMessage(order.id));
-      const waUrl = `https://wa.me/${BRAND.whatsappNumber}?text=${message}`;
+      const waNumber = (business.whatsapp || BRAND.whatsappNumber).replace(/[^\d]/g, "");
+      const waUrl = `https://wa.me/${waNumber}?text=${message}`;
 
       // Open WhatsApp in a new tab BEFORE async work to keep the user gesture
       const win = window.open(waUrl, "_blank");
