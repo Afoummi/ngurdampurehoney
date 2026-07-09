@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter/NewsletterForm";
-import { BRAND } from "@/lib/brand";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function Footer() {
+  const { business, social, footer } = useSiteSettings();
   return (
     <footer className="bg-forest-gradient text-primary-foreground mt-auto">
       <div className="container py-16 md:py-20">
