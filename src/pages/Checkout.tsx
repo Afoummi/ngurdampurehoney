@@ -37,6 +37,7 @@ export default function Checkout() {
   const { items, clearCart } = useCartStore();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const { business } = useSiteSettings();
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
 
   const [formData, setFormData] = useState<CheckoutFormData>({
