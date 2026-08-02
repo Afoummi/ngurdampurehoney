@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 import { toCSV, downloadCSV } from "@/lib/csv";
+import { logAudit } from "@/lib/audit";
 
 interface Order {
   id: string;
@@ -108,6 +109,7 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
 
       if (error) throw error;
 
+      void logAudit({ action: "order_status_changed", resourceType: "order", resourceId: orderId, details: { status } });
       toast.success(`Order status updated to ${status}`);
       fetchOrders();
       onOrderUpdate();
@@ -216,6 +218,7 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
         .update({ archived_at: archive ? new Date().toISOString() : null })
         .eq("id", orderId);
       if (error) throw error;
+      void logAudit({ action: archive ? "order_archived" : "order_restored", resourceType: "order", resourceId: orderId });
       toast.success(archive ? "Order archived" : "Order restored");
       fetchOrders();
       onOrderUpdate();
@@ -238,6 +241,7 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
       await supabase.from("order_items").delete().eq("order_id", orderId);
       const { error } = await supabase.from("orders").delete().eq("id", orderId);
       if (error) throw error;
+      void logAudit({ action: "order_deleted", resourceType: "order", resourceId: orderId });
       toast.success("Order permanently deleted");
       fetchOrders();
       onOrderUpdate();

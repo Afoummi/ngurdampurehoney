@@ -10,6 +10,7 @@ import { toCSV, downloadCSV } from "@/lib/csv";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { logAudit } from "@/lib/audit";
 
 interface Customer {
   id: string;
@@ -90,6 +91,7 @@ export function CustomersTab({ canManageRoles = false }: CustomersTabProps) {
         if (error) throw error;
       }
 
+      void logAudit({ action: "role_changed", resourceType: "user", resourceId: userId, details: { new_role: newRole } });
       toast.success(`Role updated to ${newRole}`);
       fetchCustomers();
     } catch (error) {

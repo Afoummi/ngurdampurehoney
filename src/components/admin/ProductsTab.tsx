@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Product, formatPrice, CONTAINER_TYPES, PACKAGE_SIZES } from "@/lib/products";
 import { ImageUploader } from "./ImageUploader";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { logAudit } from "@/lib/audit";
 
 
 interface ProductsTabProps {
@@ -117,12 +118,14 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
           .update(productData)
           .eq('id', editingProduct.id);
         if (error) throw error;
+        void logAudit({ action: "product_updated", resourceType: "product", resourceId: editingProduct.id, details: { name: productData.name, price: productData.price, stock: productData.stock } });
         toast.success("Product updated");
       } else {
         const { error } = await supabase
           .from('products')
           .insert(productData);
         if (error) throw error;
+        void logAudit({ action: "product_created", resourceType: "product", details: { name: productData.name, price: productData.price, stock: productData.stock } });
         toast.success("Product created");
       }
 
@@ -142,6 +145,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
     try {
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) throw error;
+      void logAudit({ action: "product_deleted", resourceType: "product", resourceId: id });
       toast.success("Product deleted");
       fetchProducts();
     } catch (error) {
@@ -157,6 +161,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
         .update({ is_active: !product.is_active })
         .eq('id', product.id);
       if (error) throw error;
+      void logAudit({ action: "product_updated", resourceType: "product", resourceId: product.id, details: { is_active: !product.is_active } });
       toast.success(product.is_active ? "Product deactivated" : "Product activated");
       fetchProducts();
     } catch (error) {
