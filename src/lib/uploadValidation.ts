@@ -8,8 +8,11 @@ const EXT_BY_MIME: Record<string, string> = {
   "image/webp": "webp",
 };
 
+export type UploadCheck = ValidatedUpload | FailedUpload;
+
 export interface ValidatedUpload {
   ok: true;
+  error?: undefined;
   /** Safe, random, extension-normalised object path */
   path: string;
   contentType: string;
@@ -18,6 +21,8 @@ export interface ValidatedUpload {
 export interface FailedUpload {
   ok: false;
   error: string;
+  path?: undefined;
+  contentType?: undefined;
 }
 
 /** Reads the first bytes and verifies real image magic numbers (defeats renamed scripts/executables). */
@@ -39,7 +44,7 @@ async function sniffMagic(file: File): Promise<string | null> {
 export async function validateImageUpload(
   file: File,
   folder: string
-): Promise<ValidatedUpload | FailedUpload> {
+): Promise<UploadCheck> {
   if (file.size === 0) return { ok: false, error: "The file is empty." };
   if (file.size > MAX_IMAGE_BYTES) return { ok: false, error: "Image is larger than 5 MB." };
 
