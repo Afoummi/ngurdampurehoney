@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { z } from "zod";
+import { logAudit } from "@/lib/audit";
+import { checkRateLimit, rateLimitMessage } from "@/lib/rateLimit";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
@@ -81,6 +83,13 @@ export default function Auth() {
       // ignore – we just want a clean slate
     }
 
+    const limit = checkRateLimit(`login:${loginEmail.toLowerCase()}`, 6, 5 * 60 * 1000);
+    if (!limit.allowed) {
+      setIsLoading(false);
+      toast.error(rateLimitMessage(limit.retryAfterSeconds));
+      return;
+    }
+
     const { error } = await signIn(loginEmail, loginPassword);
     setIsLoading(false);
 
@@ -96,6 +105,7 @@ export default function Auth() {
         toast.error(msg || "Sign in failed. Please try again.");
       }
     } else {
+      void logAudit({ action: "login", resourceType: "session" });
       toast.success("Welcome back!");
       // Role-based redirect handled in useEffect above once role is loaded
     }

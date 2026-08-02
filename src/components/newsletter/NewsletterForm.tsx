@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Send } from "lucide-react";
 import { z } from "zod";
+import { checkRateLimit, rateLimitMessage } from "@/lib/rateLimit";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 
@@ -18,6 +19,12 @@ export function NewsletterForm() {
     const result = emailSchema.safeParse(email);
     if (!result.success) {
       toast.error(result.error.errors[0].message);
+      return;
+    }
+
+    const limit = checkRateLimit("newsletter", 3, 10 * 60 * 1000);
+    if (!limit.allowed) {
+      toast.error(rateLimitMessage(limit.retryAfterSeconds));
       return;
     }
 
