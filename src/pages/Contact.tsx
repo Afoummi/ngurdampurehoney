@@ -10,6 +10,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { SEO } from "@/components/seo/SEO";
+import { z } from "zod";
+import { checkRateLimit, rateLimitMessage } from "@/lib/rateLimit";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your name").max(100, "Name is too long"),
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  subject: z.string().trim().min(3, "Please add a subject").max(150, "Subject is too long"),
+  message: z.string().trim().min(10, "Please write a longer message").max(2000, "Message is too long"),
+});
 
 export default function Contact() {
   const { business, social } = useSiteSettings();
@@ -17,8 +26,22 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent(formData.subject || "Enquiry from Ngurdam Honey website");
-    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`);
+
+    const parsed = contactSchema.safeParse(formData);
+    if (!parsed.success) {
+      toast.error(parsed.error.errors[0].message);
+      return;
+    }
+
+    const limit = checkRateLimit("contact", 3, 10 * 60 * 1000);
+    if (!limit.allowed) {
+      toast.error(rateLimitMessage(limit.retryAfterSeconds));
+      return;
+    }
+
+    const clean = parsed.data;
+    const subject = encodeURIComponent(clean.subject);
+    const body = encodeURIComponent(`Name: ${clean.name}\nEmail: ${clean.email}\n\n${clean.message}`);
     window.location.href = `mailto:${business.email}?subject=${subject}&body=${body}`;
     toast.success("Opening your email app...");
   };
@@ -69,23 +92,23 @@ export default function Contact() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name">Your Name</Label>
-                        <Input id="name" required value={formData.name}
+                        <Input id="name" required maxLength={100} value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" required value={formData.email}
+                        <Input id="email" type="email" required maxLength={255} value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="subject">Subject</Label>
-                      <Input id="subject" required value={formData.subject}
+                      <Input id="subject" required maxLength={150} value={formData.subject}
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="message">Message</Label>
-                      <Textarea id="message" required rows={5} value={formData.message}
+                      <Textarea id="message" required maxLength={2000} rows={5} value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
                     </div>
                     <Button type="submit" variant="honey" size="lg" className="w-full">

@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { ImageUploader } from "./ImageUploader";
 import { useAuth } from "@/hooks/useAuth";
 import type { SiteMediaEntry, SiteMediaSlot } from "@/hooks/useSiteMedia";
+import { logAudit } from "@/lib/audit";
 
 const SLOTS: { key: SiteMediaSlot; label: string; description: string; folder: string; aspect: "wide" | "square" }[] = [
   { key: "hero_slide", label: "Hero Slideshow", description: "Rotating images on the homepage hero.", folder: "hero", aspect: "wide" },
@@ -118,6 +119,7 @@ export function MediaTab() {
       toast.error(error.message);
       return;
     }
+    void logAudit({ action: editing ? "media_updated" : "media_uploaded", resourceType: "site_media", resourceId: editing?.id ?? null, details: { slot: payload.slot } });
     toast.success(editing ? "Media updated" : "Media added");
     setDialogOpen(false);
     fetchItems();
@@ -129,6 +131,7 @@ export function MediaTab() {
     if (m.storage_path) {
       await supabase.storage.from("product-images").remove([m.storage_path]);
     }
+    void logAudit({ action: "media_deleted", resourceType: "site_media", resourceId: m.id, details: { storage_path: m.storage_path } });
     toast.success("Deleted");
     fetchItems();
   };

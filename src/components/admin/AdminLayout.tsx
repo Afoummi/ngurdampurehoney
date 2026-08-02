@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   LayoutDashboard, ShoppingCart, Package, Boxes, Users, Mail, Megaphone,
-  BarChart3, FileText, Settings, UserCog, ShieldCheck, Image as ImageIcon,
+  BarChart3, FileText, Settings, UserCog, ShieldCheck, Image as ImageIcon, ScrollText,
 } from "lucide-react";
 
 const ADMIN_NAV = [
@@ -65,6 +65,7 @@ const ADMIN_NAV = [
     items: [
       { to: "/admin/users", label: "Admin Users", icon: UserCog },
       { to: "/admin/security", label: "Security", icon: ShieldCheck },
+      { to: "/admin/audit-logs", label: "Audit Logs", icon: ScrollText },
       { to: "/admin/settings", label: "Settings", icon: Settings },
     ],
   },

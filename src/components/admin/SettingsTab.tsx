@@ -10,6 +10,7 @@ import { Loader2, Save, Plus, Trash2, MapPin, Phone, Mail, Building2 } from "luc
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { logAudit } from "@/lib/audit";
 
 export function SettingsTab() {
   const { user, userRole } = useAuth();
@@ -29,7 +30,11 @@ export function SettingsTab() {
     const { error } = await supabase.from("site_settings").upsert({ key, value, updated_at: new Date().toISOString() });
     setSaving(null);
     if (error) toast.error(error.message);
-    else { toast.success("Settings saved"); reload(); }
+    else {
+      void logAudit({ action: "settings_changed", resourceType: "site_settings", resourceId: key });
+      toast.success("Settings saved");
+      reload();
+    }
   };
 
   if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-honey-deep" /></div>;

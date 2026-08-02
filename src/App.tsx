@@ -28,6 +28,7 @@ import AdminOverview from "./pages/admin/Overview";
 import AnalyticsPage from "./pages/admin/Analytics";
 import ReportsPage from "./pages/admin/Reports";
 import SecurityPage from "./pages/admin/Security";
+import AuditLogsPage from "./pages/admin/AuditLogs";
 import { OrdersTab } from "./components/admin/OrdersTab";
 import { ProductsTab } from "./components/admin/ProductsTab";
 import { InventoryTab } from "./components/admin/InventoryTab";
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="reports" element={<ReportsPage />} />
               <Route path="users" element={<UsersTab />} />
               <Route path="security" element={<SecurityPage />} />
+              <Route path="audit-logs" element={<AuditLogsPage />} />
               <Route path="settings" element={<SettingsTab />} />
               <Route path="testimonials" element={<TestimonialsTab />} />
               <Route path="faqs" element={<FaqsTab />} />

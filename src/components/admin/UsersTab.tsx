@@ -12,6 +12,7 @@ import {
 import { Loader2, Trash2, Users as UsersIcon, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { logAudit } from "@/lib/audit";
 
 interface AppUser {
   id: string;
@@ -60,6 +61,7 @@ export function UsersTab() {
       });
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || "Failed to delete user");
+      void logAudit({ action: "user_deleted", resourceType: "user", resourceId: userId });
       toast.success("User deleted");
       setUsers((prev) => prev.filter((u) => u.id !== userId));
     } catch (e) {
