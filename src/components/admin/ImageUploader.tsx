@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import { validateImageUpload } from "@/lib/uploadValidation";
+import { logAudit } from "@/lib/audit";
 
 interface ImageUploaderProps {
   value?: string | null;
@@ -12,8 +14,6 @@ interface ImageUploaderProps {
   label?: string;
   aspect?: "square" | "wide" | "auto";
 }
-
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
 export function ImageUploader({
   value,
@@ -28,25 +28,30 @@ export function ImageUploader({
 
   const upload = useCallback(
     async (file: File) => {
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please choose an image file");
-        return;
-      }
-      if (file.size > MAX_BYTES) {
-        toast.error("Image is larger than 5 MB");
+      const validated = await validateImageUpload(file, folder);
+      if (!validated.ok) {
+        toast.error(validated.error);
         return;
       }
 
       setIsUploading(true);
       try {
-        const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-        const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error } = await supabase.storage
           .from("product-images")
-          .upload(path, file, { cacheControl: "3600", upsert: false });
+          .upload(validated.path, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: validated.contentType,
+          });
         if (error) throw error;
-        const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-        onChange(data.publicUrl, path);
+        const { data } = supabase.storage.from("product-images").getPublicUrl(validated.path);
+        onChange(data.publicUrl, validated.path);
+        void logAudit({
+          action: "media_uploaded",
+          resourceType: "storage_object",
+          resourceId: validated.path,
+          details: { folder, size: file.size, contentType: validated.contentType },
+        });
         toast.success("Image uploaded");
       } catch (err) {
         console.error(err);
@@ -57,6 +62,7 @@ export function ImageUploader({
     },
     [folder, onChange]
   );
+
 
   const onFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
