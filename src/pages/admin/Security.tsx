@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Lock, Key, Eye, Users as UsersIcon, Database, AlertTriangle } from "lucide-react";
+import { ShieldCheck, Lock, Key, Eye, Users as UsersIcon, Database, AlertTriangle, ScrollText } from "lucide-react";
 
 export default function SecurityPage() {
   const [adminCount, setAdminCount] = useState(0);
@@ -24,6 +24,9 @@ export default function SecurityPage() {
     { icon: Eye, title: "Guest order access tokens", status: "Active", desc: "Guest checkouts get a unique x-order-access-token header to view their order without auth." },
     { icon: ShieldCheck, title: "HTML sanitization in emails", status: "Active", desc: "send-order-notification escapes all dynamic content to prevent XSS." },
     { icon: Lock, title: "Rate limiting on create-order", status: "Active", desc: "Sliding-window IP limiter — 5 attempts per 10 minutes." },
+    { icon: ScrollText, title: "Append-only audit logs", status: "Active", desc: "Sensitive staff actions are recorded in audit_logs — admin-read-only, with no update or delete policies." },
+    { icon: ShieldCheck, title: "Hardened image uploads", status: "Active", desc: "Uploads are limited to genuine JPG/PNG/WebP files (magic-byte verified, 5 MB cap) and stored under random UUID paths." },
+    { icon: Lock, title: "Abuse throttling on public forms", status: "Active", desc: "Login, contact and newsletter submissions are throttled client-side on top of server limits." },
     { icon: UsersIcon, title: "Role separation", status: "Active", desc: "Roles live in user_roles (not profiles). has_role() is SECURITY DEFINER with restricted EXECUTE." },
   ];
 
