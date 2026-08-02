@@ -73,7 +73,7 @@ export default function AuditLogsPage() {
         resource: `${r.resource_type ?? ""} ${r.resource_id ?? ""}`.trim(),
         ip: r.ip_address ?? "",
         details: r.details ? JSON.stringify(r.details) : "",
-      })));
+      }));
     downloadCSV("audit-logs.csv", toCSV(rowsOut));
   };
 
