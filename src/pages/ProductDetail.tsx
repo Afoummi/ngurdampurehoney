@@ -24,6 +24,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((s) => s.addItem);
+  const imageSrc = useImageSrc(product?.image_url, jarsLineup);
 
   useEffect(() => {
     async function load() {
@@ -109,7 +110,7 @@ export default function ProductDetail() {
           <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
             <div className="space-y-4">
               <div className="aspect-square rounded-3xl overflow-hidden bg-honey-cream shadow-lift">
-                <img src={product.image_url || jarsLineup} alt={product.name}
+                <img src={imageSrc} alt={product.name}
                   className="w-full h-full object-cover" />
               </div>
             </div>
@@ -236,14 +237,14 @@ export default function ProductDetail() {
         title={`${product.name}${product.size ? ` (${product.size})` : ""} — Ngurdam Pure Honey`}
         description={product.description || `Buy ${product.name} — raw unfiltered Nigerian honey from Ngurdam.`}
         path={`/product/${product.id}`}
-        image={product.image_url || undefined}
+        image={imageSrc || undefined}
         type="product"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Product",
           name: product.name,
           description: product.description || undefined,
-          image: product.image_url || undefined,
+          image: imageSrc || undefined,
           brand: { "@type": "Brand", name: "Ngurdam Pure Honey" },
           offers: {
             "@type": "Offer",

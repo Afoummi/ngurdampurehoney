@@ -58,8 +58,8 @@ export function CartDrawer() {
                   {items.map((item) => (
                     <div key={item.productId} className="flex gap-4 p-3 bg-card rounded-lg">
                       <div className="w-16 h-16 bg-honey-cream rounded-md overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.imageUrl || "/placeholder.svg"}
+                        <CartImage item={item} />
+
                           alt={item.productName}
                           className="w-full h-full object-cover"
                           loading="lazy"
