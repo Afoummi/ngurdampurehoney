@@ -400,7 +400,7 @@ export function OrdersTab({ onOrderUpdate }: OrdersTabProps) {
                         View
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] max-h-[90dvh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Order Details</DialogTitle>
                         <DialogDescription>
