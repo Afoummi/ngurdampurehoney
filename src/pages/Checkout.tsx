@@ -18,7 +18,17 @@ import { Loader2, ShoppingBag, ArrowLeft, ShieldCheck, MessageCircle, MapPin } f
 import { z } from "zod";
 import { BRAND } from "@/lib/brand";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useImageSrc } from "@/hooks/useImageSrc";
 import jarsLineup from "@/assets/photos/jars-lineup.jpg";
+
+function CartThumb({ imageUrl, name }: { imageUrl: string | null; name: string }) {
+  const src = useImageSrc(imageUrl, jarsLineup);
+  return (
+    <div className="w-16 h-16 bg-honey-cream rounded-lg overflow-hidden flex-shrink-0">
+      <img src={src} alt={name} className="w-full h-full object-cover" loading="lazy" />
+    </div>
+  );
+}
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(2, "Please enter your full name").max(100),
