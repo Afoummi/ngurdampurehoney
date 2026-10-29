@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { resolveImageSrc, invalidateImageSrc } from "@/lib/imageUrl";
+import { resolveImageSrc } from "@/lib/imageUrl";
 
 /**
  * Resolve a stored image reference (public storage URL, bare storage path,
