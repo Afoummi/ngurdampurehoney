@@ -303,7 +303,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg w-[calc(100vw-2rem)] max-h-[90dvh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingProduct ? "Edit Product" : "Add Product"}</DialogTitle>
             <DialogDescription>

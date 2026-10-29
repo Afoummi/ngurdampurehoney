@@ -300,10 +300,8 @@ export default function Checkout() {
                 <CardContent className="pt-5 space-y-4">
                   {items.map((item) => (
                     <div key={item.productId} className="flex gap-3">
-                      <div className="w-16 h-16 bg-honey-cream rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={item.imageUrl || jarsLineup} alt={item.productName}
-                          className="w-full h-full object-cover" loading="lazy" />
-                      </div>
+                      <CartThumb imageUrl={item.imageUrl} name={item.productName} />
+
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm leading-tight">{item.productName}</p>
                         <Badge variant="outline" className="mt-1 text-[10px]">Qty {item.quantity}</Badge>
