@@ -5,10 +5,12 @@ import { ShoppingCart } from "lucide-react";
 import { Product, formatPrice } from "@/lib/products";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
+import { useImageSrc } from "@/hooks/useImageSrc";
 import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
+  const imageSrc = useImageSrc(product.image_url, jarsLineup);
   const lowStock = product.stock > 0 && product.stock < 5;
   const outOfStock = product.stock <= 0;
 
@@ -36,8 +38,8 @@ export function ProductCard({ product }: { product: Product }) {
     <Link to={`/product/${product.id}`} className="group block">
       <article className="rounded-2xl overflow-hidden bg-card border border-border/60 hover:border-honey/40 hover:shadow-lift transition-all duration-500">
         <div className="relative aspect-square overflow-hidden bg-honey-cream">
-          <img
-            src={product.image_url || jarsLineup}
+            <img
+             src={imageSrc}
             alt={`${product.name}${product.size ? ` — ${product.size}` : ""}`}
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700 ease-out"
