@@ -6,8 +6,16 @@ import {
   Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger,
 } from "@/components/ui/sheet";
 import { ShoppingCart, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
-import { useCartStore } from "@/stores/cartStore";
+import { useCartStore, type CartItem } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/products";
+import { useImageSrc } from "@/hooks/useImageSrc";
+
+function CartImage({ item }: { item: CartItem }) {
+  const src = useImageSrc(item.imageUrl, "/placeholder.svg");
+  return (
+    <img src={src} alt={item.productName} className="w-full h-full object-cover" loading="lazy" />
+  );
+}
 
 export function CartDrawer() {
   const navigate = useNavigate();
@@ -60,10 +68,6 @@ export function CartDrawer() {
                       <div className="w-16 h-16 bg-honey-cream rounded-md overflow-hidden flex-shrink-0">
                         <CartImage item={item} />
 
-                          alt={item.productName}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
                       </div>
 
                       <div className="flex-1 min-w-0">
