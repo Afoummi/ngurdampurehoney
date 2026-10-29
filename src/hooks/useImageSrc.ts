@@ -24,13 +24,5 @@ export function useImageSrc(value: string | null | undefined, fallback?: string)
     };
   }, [value, fallback]);
 
-  // When the underlying reference changes to null (image removed), forget
-  // the previously cached signature so a re-upload signs fresh.
-  useEffect(() => {
-    return () => {
-      if (value === null) invalidateImageSrc(null);
-    };
-  }, [value]);
-
   return src;
 }
