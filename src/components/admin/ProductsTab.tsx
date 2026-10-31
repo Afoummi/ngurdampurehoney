@@ -12,6 +12,7 @@ import { Loader2, Plus, Pencil, Trash2, Package, RefreshCw } from "lucide-react"
 import { toast } from "sonner";
 import { Product, formatPrice, CONTAINER_TYPES, PACKAGE_SIZES } from "@/lib/products";
 import { ImageUploader } from "./ImageUploader";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { logAudit } from "@/lib/audit";
 

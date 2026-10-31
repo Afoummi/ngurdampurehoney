@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { validateImageUpload } from "@/lib/uploadValidation";

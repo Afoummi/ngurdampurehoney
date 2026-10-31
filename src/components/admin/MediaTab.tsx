@@ -15,6 +15,7 @@ import {
 import { Loader2, Plus, Trash2, Pencil, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { ImageUploader } from "./ImageUploader";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 import { useAuth } from "@/hooks/useAuth";
 import type { SiteMediaEntry, SiteMediaSlot } from "@/hooks/useSiteMedia";
 import { logAudit } from "@/lib/audit";
