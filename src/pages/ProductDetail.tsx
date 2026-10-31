@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingCart, Minus, Plus, ArrowLeft, ShieldCheck, Truck, Leaf } from "lucide-react";
 import { useImageSrc } from "@/hooks/useImageSrc";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 export default function ProductDetail() {
