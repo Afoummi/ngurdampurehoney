@@ -85,7 +85,7 @@ export function FaqsTab() {
           <DialogTrigger asChild>
             <Button onClick={openNew}><Plus className="h-4 w-4 mr-2" />Add FAQ</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg w-[calc(100vw-2rem)] max-h-[90dvh] overflow-y-auto">
             <DialogHeader><DialogTitle>{editing ? "Edit" : "New"} FAQ</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div><Label>Question *</Label><Input value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} /></div>

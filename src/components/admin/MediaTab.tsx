@@ -15,6 +15,7 @@ import {
 import { Loader2, Plus, Trash2, Pencil, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { ImageUploader } from "./ImageUploader";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 import { useAuth } from "@/hooks/useAuth";
 import type { SiteMediaEntry, SiteMediaSlot } from "@/hooks/useSiteMedia";
 import { logAudit } from "@/lib/audit";
@@ -191,7 +192,7 @@ export function MediaTab() {
                     <div key={m.id} className="group rounded-xl border border-border overflow-hidden bg-card">
                       <div className={`${s.aspect === "wide" ? "aspect-[16/9]" : "aspect-square"} bg-muted overflow-hidden`}>
                         {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
-                        <img src={m.image_url} alt={m.title ?? "Media image"} className="w-full h-full object-cover" />
+                        <ResolvedImage image={m.image_url} alt={m.title ?? "Media image"} className="w-full h-full object-cover" />
                       </div>
                       <div className="p-3 space-y-2">
                         <div className="flex items-start justify-between gap-2">

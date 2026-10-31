@@ -12,6 +12,7 @@ import { Loader2, Plus, Pencil, Trash2, Package, RefreshCw } from "lucide-react"
 import { toast } from "sonner";
 import { Product, formatPrice, CONTAINER_TYPES, PACKAGE_SIZES } from "@/lib/products";
 import { ImageUploader } from "./ImageUploader";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { logAudit } from "@/lib/audit";
 
@@ -234,7 +235,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                       <TableCell>
                         <div className="flex items-center gap-3">
                           {product.image_url ? (
-                            <img src={product.image_url} alt={product.name}
+                            <ResolvedImage image={product.image_url} alt={product.name}
                               className="h-12 w-12 rounded-md object-cover" />
                           ) : (
                             <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center">

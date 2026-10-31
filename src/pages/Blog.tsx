@@ -6,6 +6,7 @@ import { Calendar, ArrowRight } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter/NewsletterForm";
 import { useSiteMedia } from "@/hooks/useSiteMedia";
 import { SEO } from "@/components/seo/SEO";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 import wellness from "@/assets/photos/wellness.jpg";
 import drip from "@/assets/photos/drip.jpg";
 import beekeeper from "@/assets/photos/beekeeper.jpg";
@@ -74,8 +75,8 @@ export default function Blog() {
                 <Card key={post.id} className="border-border/60 hover:border-honey/40 transition-all duration-500 hover:shadow-lift group overflow-hidden rounded-2xl">
                   <CardHeader className="p-0">
                     <div className="aspect-[4/3] overflow-hidden bg-honey-cream">
-                      <img
-                        src={post.image}
+                      <ResolvedImage
+                        image={post.image}
                         alt={post.title}
                         loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"

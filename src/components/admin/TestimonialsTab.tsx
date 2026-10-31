@@ -107,7 +107,7 @@ export function TestimonialsTab() {
           <DialogTrigger asChild>
             <Button onClick={openNew}><Plus className="h-4 w-4 mr-2" />Add Testimonial</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg w-[calc(100vw-2rem)] max-h-[90dvh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editing ? "Edit" : "New"} Testimonial</DialogTitle>
             </DialogHeader>

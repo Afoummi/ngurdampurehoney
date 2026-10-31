@@ -6,6 +6,7 @@ import heroPour from "@/assets/photos/hero-pour.jpg";
 import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 import beekeeper from "@/assets/photos/beekeeper.jpg";
 import { useSiteMedia } from "@/hooks/useSiteMedia";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 
 // Fallback slides used only when the admin has not uploaded any hero slides.
 const FALLBACK_SLIDES = [
@@ -74,9 +75,9 @@ export function HeroSection() {
             <div className="absolute -inset-8 bg-honey/15 rounded-[3rem] blur-3xl -z-10" />
             <div className="relative aspect-[4/5] md:aspect-[5/6] rounded-[2.5rem] overflow-hidden shadow-lift ring-1 ring-border/40">
               {slides.map((s, i) => (
-                <img
+                <ResolvedImage
                   key={i}
-                  src={s.image}
+                  image={s.image}
                   alt={s.title}
                   className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === index ? "opacity-100" : "opacity-0"}`}
                   width={1600}
