@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793468050871,
+      "tag": "0000_drop_spoofable_guest_order_policy",
+      "breakpoints": true
+    }
+  ]
+}
