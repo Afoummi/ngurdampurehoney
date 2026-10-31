@@ -99,7 +99,7 @@ export function ImageUploader({
       >
         {value ? (
           <>
-            <img src={value} alt={label} className="w-full h-full object-cover" />
+            <ResolvedImage image={value} alt={label} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
               <span className="text-white text-sm font-medium">Click or drop to replace</span>
             </div>

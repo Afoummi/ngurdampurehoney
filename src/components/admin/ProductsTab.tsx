@@ -234,7 +234,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                       <TableCell>
                         <div className="flex items-center gap-3">
                           {product.image_url ? (
-                            <img src={product.image_url} alt={product.name}
+                            <ResolvedImage image={product.image_url} alt={product.name}
                               className="h-12 w-12 rounded-md object-cover" />
                           ) : (
                             <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center">

@@ -70,14 +70,3 @@ export function useSiteMedia(slot: SiteMediaSlot, options?: { includeInactive?: 
 
   return { entries, loading, error };
 }
-
-/**
- * Get the public URL for an object in the product-images bucket.
- * If value is already an absolute URL, return it as-is.
- */
-export function resolveMediaUrl(value: string | null | undefined): string {
-  if (!value) return "";
-  if (value.startsWith("http") || value.startsWith("/")) return value;
-  const { data } = supabase.storage.from("product-images").getPublicUrl(value);
-  return data.publicUrl;
-}

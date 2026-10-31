@@ -6,6 +6,7 @@ import heroPour from "@/assets/photos/hero-pour.jpg";
 import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 import beekeeper from "@/assets/photos/beekeeper.jpg";
 import { useSiteMedia } from "@/hooks/useSiteMedia";
+import { ResolvedImage } from "@/components/common/ResolvedImage";
 
 // Fallback slides used only when the admin has not uploaded any hero slides.
 const FALLBACK_SLIDES = [
