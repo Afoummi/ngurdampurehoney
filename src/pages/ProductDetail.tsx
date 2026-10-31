@@ -20,6 +20,9 @@ import jarsLineup from "@/assets/photos/jars-lineup.jpg";
 
 export default function ProductDetail() {
   const { handle } = useParams<{ handle: string }>();
+  const { business } = useSiteSettings();
+  const originShort = (business.origin || "").split(",")[0]?.trim() || "Gembu, Taraba";
+  const packagedShort = (business.address_line3 || "").split(",")[0]?.trim() || "Sokoto";
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -183,13 +186,13 @@ export default function ProductDetail() {
 
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-honey-cream border border-honey/30 text-honey-deep font-medium">
-                  NAFDAC Reg. A8-121062L
+                  NAFDAC Reg. {business.nafdac_number || "A8-121062L"}
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/60 border border-border/60">
-                  Sourced: Gembu, Taraba
+                  Sourced: {originShort}
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/60 border border-border/60">
-                  Packaged: Sokoto
+                  Packaged: {packagedShort}
                 </span>
               </div>
 
@@ -197,7 +200,7 @@ export default function ProductDetail() {
                 <AccordionItem value="desc">
                   <AccordionTrigger>About this honey</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed">
-                    {product.description || "Raw, unfiltered honey harvested by hand from the highlands of Gembu, Sardauna LGA, Taraba State, and professionally packaged in Sokoto. NAFDAC Reg. A8-121062L."} It crystallizes naturally over time — gently warm to restore its smooth flow.
+                    {product.description || `Raw, unfiltered honey harvested by hand from the highlands of ${business.origin || "Gembu, Sardauna Local Government Area, Taraba State, Nigeria"}, and professionally packaged in ${packagedShort}. NAFDAC Reg. ${business.nafdac_number || "A8-121062L"}.`} It crystallizes naturally over time — gently warm to restore its smooth flow.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="ship">
