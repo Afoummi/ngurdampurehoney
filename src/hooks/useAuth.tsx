@@ -8,6 +8,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
+  /** True once the signed-in user's roles have been fetched from user_roles. */
+  isRoleReady: boolean;
   isAdmin: boolean;
   isModerator: boolean;
   userRole: UserRole;
@@ -23,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRoleReady, setIsRoleReady] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>('customer');
 
   const isAdmin = userRole === 'admin';
@@ -44,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }, 0);
           } else {
             setUserRole('customer');
+            setIsRoleReady(true);
           }
         }
         
@@ -60,6 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (session?.user) {
         checkUserRole(session.user.id);
+      } else {
+        setIsRoleReady(true);
       }
       setIsLoading(false);
     });
@@ -77,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         console.error('Error checking user role:', error);
         setUserRole('customer');
+        setIsRoleReady(true);
         return;
       }
 
@@ -85,9 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (roles.includes('admin')) setUserRole('admin');
       else if (roles.includes('moderator')) setUserRole('moderator');
       else setUserRole('customer');
+      setIsRoleReady(true);
     } catch (error) {
       console.error('Error checking user role:', error);
       setUserRole('customer');
+      setIsRoleReady(true);
     }
   };
 
@@ -114,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUserRole('customer');
+    setIsRoleReady(false);
   };
 
   const resetPassword = async (email: string) => {
@@ -130,6 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         isLoading,
+        isRoleReady,
         isAdmin,
         isModerator,
         userRole,
