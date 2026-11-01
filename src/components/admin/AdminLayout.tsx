@@ -92,7 +92,7 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
-  const { user, isLoading, isAdmin, isModerator, signOut } = useAuth();
+  const { user, isLoading, isRoleReady, isAdmin, isModerator, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [lowStockCount, setLowStockCount] = useState(0);
@@ -105,11 +105,13 @@ export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
       navigate("/auth");
       return;
     }
-    if (!isLoading && user && !allowed) {
+    // Wait until the role check finishes before judging access, so a hard
+    // load of /admin doesn't bounce signed-in staff back home.
+    if (!isLoading && isRoleReady && user && !allowed) {
       toast.error(`${variant === "admin" ? "Admin" : "Moderator"} access required`);
       navigate("/");
     }
-  }, [isLoading, user, allowed, navigate, variant]);
+  }, [isLoading, isRoleReady, user, allowed, navigate, variant]);
 
   useEffect(() => {
     if (!allowed) return;
@@ -123,7 +125,7 @@ export function AdminLayout({ variant = "admin" }: AdminLayoutProps) {
     return () => { cancelled = true; clearInterval(id); };
   }, [allowed]);
 
-  if (isLoading || !allowed) {
+  if (isLoading || !isRoleReady || !allowed) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-honey-deep" />
