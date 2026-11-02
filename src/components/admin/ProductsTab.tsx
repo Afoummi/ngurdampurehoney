@@ -250,7 +250,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden md:table-cell">
                         <div className="flex flex-col gap-1 text-xs">
                           {product.container_type && (
                             <Badge variant="outline" className="w-fit font-normal">
@@ -271,7 +271,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                           {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden md:table-cell">
                         <Badge
                           variant="outline"
                           className={product.is_active
