@@ -184,7 +184,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" /> Products
@@ -193,7 +193,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                 {products.length} product{products.length !== 1 ? 's' : ''} in store.
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button variant="outline" size="sm" onClick={fetchProducts}>
                 <RefreshCw className="h-4 w-4 mr-2" /> Refresh
               </Button>
@@ -217,15 +217,15 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
               )}
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
+            <div className="rounded-md border overflow-x-auto">
+              <Table className="min-w-[560px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
-                    <TableHead>Packaging</TableHead>
+                    <TableHead className="hidden md:table-cell">Packaging</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden md:table-cell">Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -250,7 +250,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden md:table-cell">
                         <div className="flex flex-col gap-1 text-xs">
                           {product.container_type && (
                             <Badge variant="outline" className="w-fit font-normal">
@@ -271,7 +271,7 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
                           {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden md:table-cell">
                         <Badge
                           variant="outline"
                           className={product.is_active
