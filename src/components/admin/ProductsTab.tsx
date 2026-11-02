@@ -217,15 +217,15 @@ export function ProductsTab({ canDelete = true, canCreate = true }: ProductsTabP
               )}
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
+            <div className="rounded-md border overflow-x-auto">
+              <Table className="min-w-[560px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
-                    <TableHead>Packaging</TableHead>
+                    <TableHead className="hidden md:table-cell">Packaging</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden md:table-cell">Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
