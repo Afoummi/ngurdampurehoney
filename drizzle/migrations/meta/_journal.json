@@ -8,6 +8,13 @@
       "when": 1793468050871,
       "tag": "0000_drop_spoofable_guest_order_policy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795544361071,
+      "tag": "0001_scope_storefront_settings_and_images",
+      "breakpoints": true
     }
   ]
 }

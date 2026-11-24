@@ -1,0 +1,1 @@
+- Keep the product-images bucket private; allow public reads only for active storefront references and site_settings reads only for business/social/footer, while preserving role-scoped staff access so signed image URLs work without exposing unreferenced uploads or private settings.
