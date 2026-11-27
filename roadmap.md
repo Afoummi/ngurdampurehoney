@@ -13,3 +13,4 @@
 - [ ] Build and package the standalone XAMPP website without changing the existing Lovable app or live data.
 - [ ] Verify routes, checkout/tracking, staff permissions, responsive layouts, and ZIP contents; report any unavailable runtime checks.
 - [x] Confirmed Moderators may view/change payment status only; revenue, reports, and role/settings controls stay Admin-only.
+- [ ] Implement the Moderator payment-status control only, with server-side authorization; keep revenue, reports, and role/settings Admin-only.

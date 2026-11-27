@@ -1,1 +1,2 @@
 - Keep the product-images bucket private; allow public reads only for active storefront references and site_settings reads only for business/social/footer, while preserving role-scoped staff access so signed image URLs work without exposing unreferenced uploads or private settings.
+- Keep the XAMPP PHP/MySQL conversion isolated in its own project subtree and ZIP; do not replace or alter the existing React/Lovable app or its managed backend, so the live preview and data remain intact.
